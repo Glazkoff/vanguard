@@ -25,7 +25,7 @@ SECRET_KEY = '366!6z2oq2&)!g7h*$u22vr=9_&o0n25!2k()qx)hxol$1q%x!'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['nglazkov.ru','www.nglazkov.ru']
 
 
 # Application definition
@@ -75,8 +75,11 @@ WSGI_APPLICATION = 'vanguard.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'u1261059_default',
+	'USER': 'u1261059_default',
+	'PASSWORD': 'neT67_Wr',
+	'HOST': 'localhost'
     }
 }
 
@@ -118,3 +121,4 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT='static/'
