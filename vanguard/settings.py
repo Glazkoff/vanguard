@@ -25,7 +25,7 @@ SECRET_KEY = '366!6z2oq2&)!g7h*$u22vr=9_&o0n25!2k()qx)hxol$1q%x!'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['nglazkov.ru','www.nglazkov.ru']
+ALLOWED_HOSTS = ['nglazkov.ru', 'www.nglazkov.ru', '127.0.0.1']
 
 
 # Application definition
@@ -77,9 +77,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'u1261059_default',
-	'USER': 'u1261059_default',
-	'PASSWORD': 'neT67_Wr',
-	'HOST': 'localhost'
+        'USER': 'u1261059_default',
+        'PASSWORD': 'neT67_Wr',
+        'HOST': '37.140.192.114'
     }
 }
 
@@ -121,4 +121,4 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT='static/'
+STATIC_ROOT = 'static/'
