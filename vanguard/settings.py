@@ -25,7 +25,7 @@ SECRET_KEY = '366!6z2oq2&)!g7h*$u22vr=9_&o0n25!2k()qx)hxol$1q%x!'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['nglazkov.ru', 'www.nglazkov.ru', '127.0.0.1']
+ALLOWED_HOSTS = ['vanguard.nglazkov.ru', 'www.vanguard.nglazkov.ru', '127.0.0.1']
 
 
 # Application definition
