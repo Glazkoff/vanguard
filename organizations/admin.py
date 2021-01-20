@@ -10,6 +10,8 @@ class OrganizationAdmin(admin.ModelAdmin):
 class TariffAdmin(admin.ModelAdmin):
     """Тарифы"""
     list_display = ("organization", "positionName", "salaryPerHour")
+    list_filter = ("organization",)
+    search_fields = ("organization", "positionName")
 
 
 admin.site.register(Organization, OrganizationAdmin)
