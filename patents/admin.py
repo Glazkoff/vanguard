@@ -4,10 +4,16 @@ from django.utils.html import format_html
 from django.template import defaultfilters
 from datetime import date, timedelta
 
+class PatentPaymentReceiptInline(admin.TabularInline):
+    model = PatentPaymentReceipt
+    extra = 1
 
 class PatentAdmin(admin.ModelAdmin):
     """Патенты"""
     list_display = ('employee', 'dateOfPatentIssue', 'last_payment_receipt')
+    search_fields=('employee__fullName', 'dateOfPatentIssue', 'patentpaymentreceipt__paymentTermUntil')
+    inlines = [PatentPaymentReceiptInline]
+    # Поиск по дате выдачи патента и даты оплаты "до" пока осуществляется в формате YYYY-MM-dd
 
     def last_payment_receipt(self, obj):
         patentReceiptsQs = PatentPaymentReceipt.objects.filter(
@@ -30,6 +36,7 @@ class PatentAdmin(admin.ModelAdmin):
 class PatentPaymentReceiptAdmin(admin.ModelAdmin):
     """Квитанция оплаты патента"""
     list_display = ('patent', 'paymentTermFrom', 'paymentTermUntil')
+    search_fields=('patent__employee__fullName', 'patent__dateOfPatentIssue','paymentTermFrom', 'paymentTermUntil')
 
 
 admin.site.register(Patent, PatentAdmin)

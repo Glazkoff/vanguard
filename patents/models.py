@@ -1,7 +1,6 @@
 from django.db import models
 from employees.models import Employee
 
-
 class Patent(models.Model):
     """Патент"""
     employee = models.ForeignKey(
