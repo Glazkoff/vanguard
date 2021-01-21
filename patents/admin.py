@@ -3,8 +3,7 @@ from .models import Patent, PatentPaymentReceipt
 from django.utils.html import format_html
 from django.template import defaultfilters
 from datetime import date, timedelta
-from django.db.models import IntegerField, ExpressionWrapper
-from django.db.models import Func, F, Value, Count, Max, DateField
+from django.db.models import Max, DateField
 
 
 class PatentAdmin(admin.ModelAdmin):
