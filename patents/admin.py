@@ -24,6 +24,10 @@ class PatentAdmin(ImportExportModelAdmin):
     # Поиск по дате выдачи патента и даты оплаты "до" пока осуществляется в формате YYYY-MM-dd
     resource_class = PatentResource
 
+    def get_queryset(self, request):
+        qs = super(PatentAdmin, self).get_queryset(request)
+        return qs.filter(deleted=False)
+
     def last_payment_receipt(self, obj):
         patentReceiptsQs = PatentPaymentReceipt.objects.filter(
             patent__id=obj.id).order_by('-paymentTermUntil')

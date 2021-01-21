@@ -6,6 +6,7 @@ class Patent(models.Model):
     employee = models.ForeignKey(
         Employee, on_delete=models.CASCADE, verbose_name="ФИО сотрудника")
     dateOfPatentIssue = models.DateField("Дата выдачи патента")
+    deleted = models.BooleanField("Удалено", default=False)
 
     def __str__(self):
         return f"Патент {self.employee.fullNameInGenetive} от {self.dateOfPatentIssue}"
