@@ -5,6 +5,7 @@ from .models import Patent, PatentPaymentReceipt
 from django.utils.html import format_html
 from django.template import defaultfilters
 from datetime import date, timedelta
+from django.db.models import Max, DateField
 
 class PatentPaymentReceiptInline(admin.TabularInline):
     """Квитанции об оплате патентов"""
@@ -18,7 +19,6 @@ class PatentResource(resources.ModelResource):
 
 class PatentAdmin(ImportExportModelAdmin):
     """Патенты"""
-    list_display = ('employee', 'dateOfPatentIssue', 'last_payment_receipt')
     search_fields=('employee__fullName', 'dateOfPatentIssue', 'patentpaymentreceipt__paymentTermUntil')
     inlines = [PatentPaymentReceiptInline]
     # Поиск по дате выдачи патента и даты оплаты "до" пока осуществляется в формате YYYY-MM-dd
@@ -26,8 +26,9 @@ class PatentAdmin(ImportExportModelAdmin):
 
     def get_queryset(self, request):
         qs = super(PatentAdmin, self).get_queryset(request)
-        return qs.filter(deleted=False)
-
+        qs = qs.filter(deleted=False).annotate(_last_payment_receipt=Max("patentpaymentreceipt__paymentTermUntil", output_field=DateField())).order_by('_last_payment_receipt')
+        return qs
+    
     def last_payment_receipt(self, obj):
         patentReceiptsQs = PatentPaymentReceipt.objects.filter(
             patent__id=obj.id).order_by('-paymentTermUntil')
@@ -36,14 +37,15 @@ class PatentAdmin(ImportExportModelAdmin):
             formatPatentExpirency = defaultfilters.date(
                 patentExpirency, 'd E Y г.')
             d = date.today()+timedelta(days=14)
-            if patentExpirency < d:
+            if patentExpirency <= d:
                 return format_html('<b style="color:red;">{}</b>', formatPatentExpirency)
             else:
                 return format_html('<b>{}</b>', formatPatentExpirency)
         else:
             return "-"
     last_payment_receipt.short_description = "Оплачен до"
-    last_payment_receipt.admin_order_field = 'patentPaymentReceipt'
+    last_payment_receipt.admin_order_field = '_last_payment_receipt'
+    list_display = ('employee', 'dateOfPatentIssue', 'last_payment_receipt')
 
 class PatentPaymentReceiptResource(resources.ModelResource): 
     """Ресурс для импорта-экспорта квитанций об оплате патентов"""
