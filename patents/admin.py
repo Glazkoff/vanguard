@@ -3,12 +3,18 @@ from .models import Patent, PatentPaymentReceipt
 from django.utils.html import format_html
 from django.template import defaultfilters
 from datetime import date, timedelta
+from django.db.models import IntegerField, ExpressionWrapper
+from django.db.models import Func, F, Value, Count, Max, DateField
 
 
 class PatentAdmin(admin.ModelAdmin):
     """Патенты"""
-    list_display = ('employee', 'dateOfPatentIssue', 'last_payment_receipt')
 
+    def get_queryset(self, request):
+        qs = super(PatentAdmin, self).get_queryset(request)
+        qs = qs.annotate(_last_payment_receipt=Max("patentpaymentreceipt__paymentTermUntil", output_field=DateField())).order_by('_last_payment_receipt')
+        return qs
+    
     def last_payment_receipt(self, obj):
         patentReceiptsQs = PatentPaymentReceipt.objects.filter(
             patent__id=obj.id).order_by('-paymentTermUntil')
@@ -17,15 +23,16 @@ class PatentAdmin(admin.ModelAdmin):
             formatPatentExpirency = defaultfilters.date(
                 patentExpirency, 'd E Y г.')
             d = date.today()+timedelta(days=14)
-            if patentExpirency < d:
+            if patentExpirency <= d:
                 return format_html('<b style="color:red;">{}</b>', formatPatentExpirency)
             else:
                 return format_html('<b>{}</b>', formatPatentExpirency)
         else:
             return "-"
     last_payment_receipt.short_description = "Оплачен до"
-    last_payment_receipt.admin_order_field = 'patentPaymentReceipt'
+    last_payment_receipt.admin_order_field = '_last_payment_receipt'
 
+    list_display = ('employee', 'dateOfPatentIssue', 'last_payment_receipt')
 
 class PatentPaymentReceiptAdmin(admin.ModelAdmin):
     """Квитанция оплаты патента"""
