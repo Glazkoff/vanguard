@@ -85,6 +85,13 @@ DATABASES = {
         'USER': 'u1261059_default',
         'PASSWORD': 'neT67_Wr',
         'HOST': '37.140.192.114'
+    },
+    'dev': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'u1261059_dev',
+        'USER': 'u1261059_dev',
+        'PASSWORD': 'nikita2021',
+        'HOST': '37.140.192.114'
     }
 }
 
