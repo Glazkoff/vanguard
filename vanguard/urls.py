@@ -19,7 +19,6 @@ from django.urls import path
 admin.site.index_title = 'Информационная система "Авангард"'
 admin.site.site_title = "Авангард"
 admin.site.site_url = ""
-admin.site.site_url = ""
 
 urlpatterns = [
     path('', admin.site.urls),
