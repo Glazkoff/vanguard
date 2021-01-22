@@ -2,6 +2,7 @@ from import_export.admin import ImportExportModelAdmin
 from import_export import resources
 from django.contrib import admin
 from .models import Employee, EmployeeInOrganization
+from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
 
 class EmployeeResource(resources.ModelResource):
     """Ресурс сотрудника для импорта"""
@@ -10,9 +11,9 @@ class EmployeeResource(resources.ModelResource):
 
 class EmployeeAdmin(ImportExportModelAdmin):
     """Работники"""
+    list_display = ("fullName", "fullNameInGenetive","birthday","passportNumber","passportIssuedBy","passportValidityPeriod","citizenship","phoneNumber","INN","SNILS","registrationAddress","registrationValidityPeriod","dateOfNotificationMVDadmission","dateOfNotificationMVDdischarge","bankDetails")
     exclude = ('createdAt', 'updatedAt')
-    # list_display=('')
-    list_filter = ('birthday','citizenship','registrationValidityPeriod','dateOfNotificationMVDadmission','dateOfNotificationMVDdischarge')
+    list_filter = ('citizenship',('registrationValidityPeriod',DateRangeFilter),('dateOfNotificationMVDadmission',DateRangeFilter),('dateOfNotificationMVDdischarge',DateRangeFilter))
     search_fields=('fullName','fullNameInGenetive')
     fieldsets = (
         (None, {

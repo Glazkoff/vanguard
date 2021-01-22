@@ -3,3 +3,4 @@ Django
 django-import-export
 mysqlclient
 django-admin-interface
+django-admin-rangefilter

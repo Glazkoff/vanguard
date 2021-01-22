@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'import_export',
     'employees',
     'organizations',
-    'patents'
+    'patents',
+    'rangefilter'
 ]
 
 IMPORT_EXPORT_IMPORT_PERMISSION_CODE = 'add'
