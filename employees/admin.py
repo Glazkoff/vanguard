@@ -10,8 +10,8 @@ class EmployeeResource(resources.ModelResource):
 
 class EmployeeAdmin(ImportExportModelAdmin):
     """Работники"""
+    list_display = ("fullName", "fullNameInGenetive","birthday","passportNumber","passportIssuedBy","passportValidityPeriod","citizenship","phoneNumber","INN","SNILS","registrationAddress","registrationValidityPeriod","dateOfNotificationMVDadmission","dateOfNotificationMVDdischarge","bankDetails")
     exclude = ('createdAt', 'updatedAt')
-    # list_display=('')
     list_filter = ('birthday','citizenship','registrationValidityPeriod','dateOfNotificationMVDadmission','dateOfNotificationMVDdischarge')
     search_fields=('fullName','fullNameInGenetive')
     fieldsets = (
