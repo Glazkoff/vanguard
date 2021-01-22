@@ -30,6 +30,11 @@ class EmployeeAdmin(ImportExportModelAdmin):
     )
     resource_class = EmployeeResource
 
+    def get_queryset(self, request):
+        qs = super(EmployeeAdmin, self).get_queryset(request)
+        return qs.filter(deleted=False)
+
+
 class EmployeeInOrganizationResource(resources.ModelResource):
     """Ресурс сотрудника в организации для импорта"""
     class Meta:

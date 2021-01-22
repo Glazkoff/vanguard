@@ -8,6 +8,8 @@ class Organization(models.Model):
         "Юридический адрес организации")
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
+    deleted = models.BooleanField("Удалено", default=False)
+
 
     def __str__(self):
         return self.organizationName
@@ -25,6 +27,8 @@ class Tariff(models.Model):
     salaryPerHour = models.PositiveIntegerField("Заработная плата в час")
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
+    deleted = models.BooleanField("Удалено", default=False)
+
 
     def __str__(self):
         return f"{self.positionName} ({self.salaryPerHour}₽ в час)"
