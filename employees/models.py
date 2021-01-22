@@ -24,6 +24,8 @@ class Employee(models.Model):
     bankDetails = models.TextField("Банковские реквизиты")
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
+    deleted = models.BooleanField("Удалено", default=False)
+
 
     def __str__(self):
         return self.fullName

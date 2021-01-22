@@ -32,6 +32,8 @@ ALLOWED_HOSTS = ['vanguard.nglazkov.ru',
 # Application definition
 
 INSTALLED_APPS = [
+    'admin_interface', 
+    'colorfield',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -44,6 +46,9 @@ INSTALLED_APPS = [
     'patents'
 ]
 
+IMPORT_EXPORT_IMPORT_PERMISSION_CODE = 'add'
+IMPORT_EXPORT_EXPORT_PERMISSION_CODE = 'view'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -51,7 +56,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 ROOT_URLCONF = 'vanguard.urls'

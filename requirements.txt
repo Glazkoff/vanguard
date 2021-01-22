@@ -2,3 +2,4 @@ autopep8
 Django
 django-import-export
 mysqlclient
+django-admin-interface
