@@ -1,5 +1,6 @@
 from django.db import models
 from employees.models import Employee
+from django.core.exceptions import ValidationError
 
 class Patent(models.Model):
     """Патент"""
@@ -29,3 +30,7 @@ class PatentPaymentReceipt(models.Model):
     class Meta:
         verbose_name = "Квитанция оплаты патента"
         verbose_name_plural = "Квитанции оплаты патентов"
+
+    def clean(self):
+        if self.paymentTermFrom > self.paymentTermUntil:
+            raise ValidationError("Начало срока оплаты патента превышает его окончание")
