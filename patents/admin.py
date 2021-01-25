@@ -6,6 +6,7 @@ from django.utils.html import format_html
 from django.template import defaultfilters
 from datetime import date, timedelta
 from django.db.models import Max, DateField
+from import_export.formats import base_formats
 
 class PatentPaymentReceiptInline(admin.TabularInline):
     """Квитанции об оплате патентов"""
@@ -23,7 +24,18 @@ class PatentAdmin(ImportExportModelAdmin):
     inlines = [PatentPaymentReceiptInline]
     # Поиск по дате выдачи патента и даты оплаты "до" пока осуществляется в формате YYYY-MM-dd
     resource_class = PatentResource
-
+    def get_export_formats(self):
+            formats = (
+                  base_formats.XLS,
+                  base_formats.XLSX,
+            )
+            return [f for f in formats if f().can_export()]
+    def get_import_formats(self):
+            formats = (
+                  base_formats.XLS,
+                  base_formats.XLSX,
+            )
+            return [f for f in formats if f().can_import()]
     def get_queryset(self, request):
         qs = super(PatentAdmin, self).get_queryset(request)
         qs = qs.filter(deleted=False).annotate(_last_payment_receipt=Max("patentpaymentreceipt__paymentTermUntil", output_field=DateField())).order_by('_last_payment_receipt')
@@ -57,6 +69,17 @@ class PatentPaymentReceiptAdmin(ImportExportModelAdmin):
     list_display = ('patent', 'paymentTermFrom', 'paymentTermUntil')
     search_fields=('patent__employee__fullName', 'patent__dateOfPatentIssue','paymentTermFrom', 'paymentTermUntil')
     resource_class = PatentPaymentReceiptResource
-
+    def get_export_formats(self):
+            formats = (
+                  base_formats.XLS,
+                  base_formats.XLSX,
+            )
+            return [f for f in formats if f().can_export()]
+    def get_import_formats(self):
+            formats = (
+                  base_formats.XLS,
+                  base_formats.XLSX,
+            )
+            return [f for f in formats if f().can_import()]
 admin.site.register(Patent, PatentAdmin)
 admin.site.register(PatentPaymentReceipt, PatentPaymentReceiptAdmin)

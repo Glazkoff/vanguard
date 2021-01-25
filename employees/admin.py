@@ -3,6 +3,7 @@ from import_export import resources
 from django.contrib import admin
 from .models import Employee, EmployeeInOrganization
 from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
+from import_export.formats import base_formats
 
 class EmployeeResource(resources.ModelResource):
     """Ресурс сотрудника для импорта"""
@@ -30,6 +31,18 @@ class EmployeeAdmin(ImportExportModelAdmin):
         }),
     )
     resource_class = EmployeeResource
+    def get_export_formats(self):
+            formats = (
+                  base_formats.XLS,
+                  base_formats.XLSX,
+            )
+            return [f for f in formats if f().can_export()]
+    def get_import_formats(self):
+            formats = (
+                  base_formats.XLS,
+                  base_formats.XLSX,
+            )
+            return [f for f in formats if f().can_import()]
 
     def get_queryset(self, request):
         qs = super(EmployeeAdmin, self).get_queryset(request)
@@ -47,6 +60,21 @@ class EmployeeInOrganizationAdmin(ImportExportModelAdmin):
     list_filter = ('tariff','organization__organizationName')
     search_fields=('tariff__positionName','organization__organizationName')
     resource_class = EmployeeInOrganizationResource
+    def get_export_formats(self):
+            formats = (
+                  base_formats.XLS,
+                  base_formats.XLSX,
+            )
+            return [f for f in formats if f().can_export()]
+    def get_import_formats(self):
+            formats = (
+                  base_formats.XLS,
+                  base_formats.XLSX,
+            )
+            return [f for f in formats if f().can_import()]
+    def get_queryset(self, request):
+        qs = super(EmployeeAdmin, self).get_queryset(request)
+        return qs.filter(deleted=False)
 
 
 admin.site.register(Employee, EmployeeAdmin)
