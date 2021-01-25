@@ -89,6 +89,11 @@ class PatentPaymentReceiptAdmin(ImportExportModelAdmin):
                      'patent__dateOfPatentIssue', 'paymentTermFrom', 'paymentTermUntil')
     resource_class = PatentPaymentReceiptResource
 
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "patent":
+            kwargs["queryset"] = Patent.objects.filter(deleted=False)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
 
 admin.site.register(Patent, PatentAdmin)
 admin.site.register(PatentPaymentReceipt, PatentPaymentReceiptAdmin)
