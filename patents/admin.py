@@ -23,12 +23,14 @@ class PatentAdmin(ImportExportModelAdmin):
     inlines = [PatentPaymentReceiptInline]
     # Поиск по дате выдачи патента и даты оплаты "до" пока осуществляется в формате YYYY-MM-dd
     resource_class = PatentResource
+    actions = ["makeDeleted",]
 
     def get_queryset(self, request):
-        qs = super(PatentAdmin, self).get_queryset(request)
-        qs = qs.filter(deleted=False).annotate(_last_payment_receipt=Max("patentpaymentreceipt__paymentTermUntil", output_field=DateField())).order_by('_last_payment_receipt')
-        return qs
-    
+            qs = super(PatentAdmin, self).get_queryset(request)
+            qs = qs.filter(deleted=False).annotate(_last_payment_receipt=Max(
+                "patentpaymentreceipt__paymentTermUntil", output_field=DateField())).order_by('_last_payment_receipt')
+            return qs
+
     def last_payment_receipt(self, obj):
         patentReceiptsQs = PatentPaymentReceipt.objects.filter(
             patent__id=obj.id).order_by('-paymentTermUntil')
@@ -43,6 +45,18 @@ class PatentAdmin(ImportExportModelAdmin):
                 return format_html('<b>{}</b>', formatPatentExpirency)
         else:
             return "-"
+
+    def makeDeleted(self, request, queryset):
+        row_update = queryset.update(deleted=True)
+        if row_update == 1:
+            message_bit = "1 запись была обновлена"
+        else:
+            message_bit = f"{row_update} записей были обновлены"
+        self.message_user(request, f"{message_bit}")
+
+    makeDeleted.short_description = "Удалить выбранные патенты"
+    makeDeleted.allowed_permissions = ('delete', )
+
     last_payment_receipt.short_description = "Оплачен до"
     last_payment_receipt.admin_order_field = '_last_payment_receipt'
     list_display = ('employee', 'dateOfPatentIssue', 'last_payment_receipt')
