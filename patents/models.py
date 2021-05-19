@@ -11,6 +11,15 @@ class Patent(models.Model):
     def __str__(self):
         return f"Патент {self.employee.fullNameInGenetive} от {self.dateOfPatentIssue}"
 
+    def delete(self, *args, **kwargs):
+        if self.deleted == False:
+            self.deleted = True
+            self.save()
+        else: 
+            print('No, man, I have already deleted! Give up!')
+
+    
+
     class Meta:
         verbose_name = "Патент"
         verbose_name_plural = "Патенты"
