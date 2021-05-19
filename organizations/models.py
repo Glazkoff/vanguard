@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import int_list_validator
 
 
 class Organization(models.Model):
@@ -24,7 +25,7 @@ class Tariff(models.Model):
     organization = models.ForeignKey(
         Organization, on_delete=models.CASCADE, verbose_name="Название организации")
     positionName = models.CharField("Название должности", max_length=150)
-    salaryPerHour = models.PositiveIntegerField("Заработная плата в час")
+    salaryPerHour = models.PositiveIntegerField("Заработная плата в час", validators=[int_list_validator( sep = '' , message = "ИНН должен содержать только цифры" , code = 'invalid' , allow_negative = False )])
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
     deleted = models.BooleanField("Удалено", default=False)
