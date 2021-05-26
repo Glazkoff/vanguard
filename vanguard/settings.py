@@ -25,14 +25,14 @@ SECRET_KEY = '366!6z2oq2&)!g7h*$u22vr=9_&o0n25!2k()qx)hxol$1q%x!'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['vanguard.nglazkov.ru',
-                 'www.vanguard.nglazkov.ru', '127.0.0.1']
+# ALLOWED_HOSTS = ['vanguard.nglazkov.ru',
+#  'www.vanguard.nglazkov.ru', '127.0.0.1']
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'admin_interface', 
+    'admin_interface',
     'colorfield',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -85,18 +85,12 @@ WSGI_APPLICATION = 'vanguard.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'u1261059_default',
-        'USER': 'u1261059_default',
-        'PASSWORD': 'neT67_Wr',
-        'HOST': '37.140.192.114'
-    },
-    'dev': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'u1261059_dev',
-        'USER': 'u1261059_dev',
-        'PASSWORD': 'nikita2021',
-        'HOST': '37.140.192.114'
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': 'db',
+        'PORT': 5432,
     }
 }
 

@@ -1,20 +1,25 @@
 from django.db import models
 from organizations.models import Organization, Tariff
+from django.core.validators import MaxLengthValidator, MinLengthValidator, int_list_validator, MaxValueValidator, RegexValidator
+from datetime import date
+
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 
 
 class Employee(models.Model):
     """Работники"""
-    fullName = models.CharField("ФИО", max_length=120)
+    fullName = models.CharField("ФИО", max_length=120, validators=[RegexValidator( regex=r'^[a-zA-Zа-яА-ЯёЁ -]+$', message = "ФИО должно содержать только буквы" , code = None , inverse_match = None , flags = 0 )])
     fullNameInGenetive = models.CharField(
-        "Родительный падеж ФИО", max_length=120)
-    birthday = models.DateField("Дата рождения")
-    passportNumber = models.CharField("Номер паспорта", max_length=40)
+        "Родительный падеж ФИО", max_length=120, validators=[RegexValidator( regex=r'^[a-zA-Zа-яА-ЯёЁ -]+$', message = "ФИО должно содержать только буквы" , code = None , inverse_match = None , flags = 0 )])
+    birthday = models.DateField("Дата рождения", validators=[MaxValueValidator(limit_value=date.today, message = "Дата рождения не может превышать сегодняшнюю")])
+    passportNumber = models.CharField("Номер паспорта", max_length=40, validators=[int_list_validator( sep = ' ' , message = "Неправильный вид номера паспорта" , code = 'invalid' , allow_negative = False )])
     passportIssuedBy = models.TextField("Кем выдан паспорт")
     passportValidityPeriod = models.DateField("Срок действия паспорта")
-    citizenship = models.CharField("Гражданство", max_length=120)
+    citizenship = models.CharField("Гражданство", max_length=120, validators=[RegexValidator( regex=r'^[a-zA-Zа-яА-ЯёЁ ]+$', message = "Название страны содержить только буквы" , code = None , inverse_match = None , flags = 0 )])
     phoneNumber = models.CharField("Номер телефона", max_length=40)
-    INN = models.CharField("ИНН", max_length=12)
-    SNILS = models.CharField("СНИЛС", max_length=11)
+    INN = models.CharField("ИНН", max_length=12, validators=[MinLengthValidator(limit_value=12, message="ИНН не может состоят из менее чем 12 цифр"), int_list_validator( sep = '' , message = "ИНН должен содержать только цифры" , code = 'invalid' , allow_negative = False )])
+    SNILS = models.CharField("СНИЛС", max_length=11, validators=[MinLengthValidator(limit_value=11, message="СНИЛС не может состоят из менее чем 11 цифр"), int_list_validator( sep = '' , message = "СНИЛС должен содержать только цифры" , code = 'invalid' , allow_negative = False )])
     registrationAddress = models.TextField("Адрес регистрации")
     registrationValidityPeriod = models.DateField("Срок действия регистрации")
     dateOfNotificationMVDadmission = models.DateField(
@@ -33,6 +38,10 @@ class Employee(models.Model):
     class Meta:
         verbose_name = "Работник"
         verbose_name_plural = "Работники"
+
+    def clean(self):
+        if self.dateOfNotificationMVDadmission > self.dateOfNotificationMVDdischarge:
+            raise ValidationError("Дата уведомления о приеме превышает даты при увольнении")
 
 
 class EmployeeInOrganization(models.Model):

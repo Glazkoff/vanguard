@@ -3,3 +3,4 @@ Django
 django-import-export
 mysqlclient
 django-admin-interface
+psycopg2-binary>=2.8

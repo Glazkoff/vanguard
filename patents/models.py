@@ -1,5 +1,6 @@
 from django.db import models
 from employees.models import Employee
+from django.core.exceptions import ValidationError
 
 class Patent(models.Model):
     """Патент"""
@@ -10,6 +11,15 @@ class Patent(models.Model):
 
     def __str__(self):
         return f"Патент {self.employee.fullNameInGenetive} от {self.dateOfPatentIssue}"
+
+    def delete(self, *args, **kwargs):
+        if self.deleted == False:
+            self.deleted = True
+            self.save()
+        else: 
+            print('No, man, I have already deleted! Give up!')
+
+    
 
     class Meta:
         verbose_name = "Патент"
@@ -29,3 +39,7 @@ class PatentPaymentReceipt(models.Model):
     class Meta:
         verbose_name = "Квитанция оплаты патента"
         verbose_name_plural = "Квитанции оплаты патентов"
+
+    def clean(self):
+        if self.paymentTermFrom > self.paymentTermUntil:
+            raise ValidationError("Начало срока оплаты патента превышает его окончание")
