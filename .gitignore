@@ -1,20 +1,65 @@
+### OSX ###
 .DS_Store
-node_modules
-db.sqlite3
-/dist
-/venv
+.AppleDouble
+.LSOverride
+
+### SublimeText ###
+# cache files for sublime text
+*.tmlanguage.cache
+*.tmPreferences.cache
+*.stTheme.cache
+
+*.sublime-project
+*.sublime-workspace
+
+# sftp configuration file
+sftp-config.json
+
+# Basics
+*.py[cod]
 __pycache__
-package-lock.json
 
-# local env files
-.env
-.env.local
-.env.*.local
-
-# Log files
+# Logs
+logs
+*.log
+pip-log.txt
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Unit test / coverage reports
+.coverage
+.tox
+nosetests.xml
+htmlcov
+
+# Translations
+*.mo
+*.pot
+
+# Webpack
+webpack-stats.json
+dist/
+
+# Vim
+*~
+*.swp
+*.swo
+
+# npm
+node_modules
+
+# Compass
+.sass-cache
+
+# User-uploaded media
+media/
+
+# Collected staticfiles
+*/staticfiles/
+
+.cache/
+**/certs
 
 # Editor directories and files
 .idea
@@ -24,3 +69,10 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw*
+
+# VS code
+.vscode
+.pythonconfig
+
+# Venv
+venv
