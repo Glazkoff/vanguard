@@ -22,11 +22,14 @@ class Employee(models.Model):
     SNILS = models.CharField("СНИЛС", max_length=11, validators=[MinLengthValidator(limit_value=11, message="СНИЛС не может состоят из менее чем 11 цифр"), int_list_validator( sep = '' , message = "СНИЛС должен содержать только цифры" , code = 'invalid' , allow_negative = False )])
     registrationAddress = models.TextField("Адрес регистрации")
     registrationValidityPeriod = models.DateField("Срок действия регистрации")
-    dateOfNotificationMVDadmission = models.DateField(
-        "Дата уведомления МВД при приёме")
-    dateOfNotificationMVDdischarge = models.DateField(
-        "Дата уведомления МВД при увольнении")
+    dateOfNotificationUFMSadmission = models.DateField(
+        "Дата уведомления УФМС при приёме")
+    dateOfNotificationUFMSdischarge = models.DateField(
+        "Дата уведомления УФМС при увольнении")
     bankDetails = models.TextField("Банковские реквизиты")
+    endDateOfRVP = models.DateField("Дата окончания РВП")
+    endDateOfResidencePermit = models.DateField("Дата окончания вида на жительство")
+    
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
     deleted = models.BooleanField("Удалено", default=False)
@@ -62,9 +65,13 @@ class EmployeeInOrganization(models.Model):
     employmentContractNumber = models.CharField(
         "Номер трудового договора", max_length=100)
     employmentContractDate = models.DateField("Дата трудового договора")
+    GPHContractNumber = models.CharField(
+        "Номер ГПХ договора", max_length=100, null=True, blank=True)
+    startDateOfGPHContract = models.DateField("Дата начала действия ГПХ Договора", null=True, blank=True)
+    endDateOfGPHContract = models.DateField("Дата окончания действия ГПХ Договора", null=True, blank=True)
+    
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
-
     def __str__(self):
         return f"Работа {self.employee.fullNameInGenetive} в {self.organization.organizationName} по должности {self.tariff.positionName} ({self.tariff.salaryPerHour}₽ в час)"
 

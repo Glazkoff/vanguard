@@ -12,11 +12,11 @@ class EmployeeAdmin(ImportExportModelAdmin):
     """Работники"""
     exclude = ('createdAt', 'updatedAt')
     # list_display=('')
-    list_filter = ('birthday','citizenship','registrationValidityPeriod','dateOfNotificationMVDadmission','dateOfNotificationMVDdischarge')
+    list_filter = ('birthday','citizenship','registrationValidityPeriod','dateOfNotificationUFMSadmission','dateOfNotificationUFMSdischarge', 'endDateOfResidencePermit', 'endDateOfRVP')
     search_fields=('fullName','fullNameInGenetive')
     fieldsets = (
         (None, {
-            'fields': (('fullName','fullNameInGenetive'), 'birthday','phoneNumber',('INN','SNILS'),'bankDetails')
+            'fields': (('fullName','fullNameInGenetive'), 'birthday','phoneNumber',('INN','SNILS'),'bankDetails', ('endDateOfResidencePermit', 'endDateOfRVP'))
         }),
         ('Данные паспорта', {
             'fields': (('passportNumber','passportValidityPeriod'),'citizenship', 'passportIssuedBy')
@@ -24,8 +24,8 @@ class EmployeeAdmin(ImportExportModelAdmin):
         ('Данные о регистрации', {
             'fields': ( 'registrationValidityPeriod','registrationAddress')
         }),
-        ('Данные из МВД', {
-            'fields': ('dateOfNotificationMVDadmission', 'dateOfNotificationMVDdischarge')
+        ('Данные из УФМС', {
+            'fields': ('dateOfNotificationUFMSadmission', 'dateOfNotificationUFMSdischarge')
         }),
     )
     resource_class = EmployeeResource
