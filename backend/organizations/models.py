@@ -7,6 +7,8 @@ class Organization(models.Model):
     organizationName = models.TextField("Название организации")
     legalOrganizationAddress = models.TextField(
         "Юридический адрес организации")
+    cityOrganization = models.TextField(
+        "Город организации")
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
     deleted = models.BooleanField("Удалено", default=False)

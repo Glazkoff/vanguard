@@ -10,7 +10,7 @@ class OrganizationResource(resources.ModelResource):
 
 class OrganizationAdmin(ImportExportModelAdmin):
     """Организации"""
-    list_display = ("organizationName", "legalOrganizationAddress")
+    list_display = ("organizationName", "legalOrganizationAddress", "cityOrganization")
     list_display_links = ("organizationName",)
     search_fields = ("organizationName",)
     ordering = ['-organizationName']
