@@ -5,3 +5,7 @@ mysqlclient
 django-admin-interface
 psycopg2-binary>=2.8
 django-environ
+docx
+docxtpl
+python-docx
+jinja2
