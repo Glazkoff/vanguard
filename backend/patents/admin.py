@@ -6,7 +6,8 @@ from django.utils.html import format_html
 from django.template import defaultfilters
 from datetime import date, timedelta
 from django.db.models import Max, DateField
-
+from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
+from import_export.formats import base_formats
 
 class PatentPaymentReceiptInline(admin.TabularInline):
     """Квитанции об оплате патентов"""
@@ -28,6 +29,19 @@ class PatentAdmin(ImportExportModelAdmin):
     # Поиск по дате выдачи патента и даты оплаты "до" пока осуществляется в формате YYYY-MM-dd
     resource_class = PatentResource
     actions = ["makeDeleted", ]
+
+    def get_export_formats(self):
+            formats = (
+                  base_formats.XLS,
+                  base_formats.XLSX,
+            )
+            return [f for f in formats if f().can_export()]
+    def get_import_formats(self):
+            formats = (
+                  base_formats.XLS,
+                  base_formats.XLSX,
+            )
+            return [f for f in formats if f().can_import()]
 
     def get_queryset(self, request):
         qs = super(PatentAdmin, self).get_queryset(request)
@@ -89,6 +103,18 @@ class PatentPaymentReceiptAdmin(ImportExportModelAdmin):
                      'patent__dateOfPatentIssue', 'paymentTermFrom', 'paymentTermUntil')
     resource_class = PatentPaymentReceiptResource
 
+    def get_export_formats(self):
+            formats = (
+                  base_formats.XLS,
+                  base_formats.XLSX,
+            )
+            return [f for f in formats if f().can_export()]
+    def get_import_formats(self):
+            formats = (
+                  base_formats.XLS,
+                  base_formats.XLSX,
+            )
+            return [f for f in formats if f().can_import()]
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "patent":
             kwargs["queryset"] = Patent.objects.filter(deleted=False)
