@@ -1,6 +1,5 @@
 import io, os, tempfile, zipfile
 from django.http import HttpResponse
-from wsgiref.util import FileWrapper
 from docxtpl import DocxTemplate
 from vanguard.settings import MEDIA_ROOT
 
