@@ -4,7 +4,7 @@ from django.core.validators import int_list_validator
 
 class Organization(models.Model):
     """Организация"""
-    organizationName = models.TextField("Название организации")
+    organizationName = models.CharField("Название организации", max_length=150)
     legalOrganizationAddress = models.TextField(
         "Юридический адрес организации")
     cityOrganization = models.TextField(

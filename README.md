@@ -19,6 +19,12 @@ python manage.py collectstatic
 
 ## Полезные ссылки
 
+- [django-modeltranslation](https://github.com/deschler/django-modeltranslation)
+
+### Настройка административной панели
+
+[Библиотека с подробной настройкой django-admin-tools](https://github.com/django-admin-tools/django-admin-tools)
+
 ### Новые стили для административной панели
 
 [Разные шаблоны для админки джанго (есть бесплатные и с мобильной версией)](https://appseed.us/admin-dashboards/django?ref=dev) <br>
