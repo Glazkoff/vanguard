@@ -3,27 +3,31 @@ from import_export import resources
 from django.contrib import admin
 from .models import Employee, EmployeeInOrganization
 from admin_interface.models import Theme
+from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
+from import_export.formats import base_formats
+
 
 class EmployeeResource(resources.ModelResource):
     """Ресурс сотрудника для импорта"""
     class Meta:
         model = Employee
 
+
 class EmployeeAdmin(ImportExportModelAdmin):
     """Работники"""
     exclude = ('createdAt', 'updatedAt')
-    # list_display=('',)
-    list_filter = ('birthday','citizenship','registrationValidityPeriod','dateOfNotificationUFMSadmission','dateOfNotificationUFMSdischarge', 'endDateOfResidencePermit', 'endDateOfRVP', 'passportIssueDate')
-    search_fields=('fullName','fullNameInGenetive')
+    list_filter = ('birthday', 'citizenship', ('registrationValidityPeriod', DateRangeFilter), ('dateOfNotificationUFMSadmission', DateRangeFilter),
+                   ('dateOfNotificationUFMSdischarge', DateRangeFilter), ('endDateOfResidencePermit', DateRangeFilter), ('endDateOfRVP', DateRangeFilter))
+    search_fields = ('fullName', 'fullNameInGenetive')
     fieldsets = (
         (None, {
-            'fields': (('fullName','fullNameInGenetive'), 'birthday', 'birthplace', 'phoneNumber',('INN','SNILS'),'bankDetailsCardNumber', ('endDateOfResidencePermit', 'endDateOfRVP'))
+            'fields': (('fullName', 'fullNameInGenetive'), 'birthday', 'birthplace', 'phoneNumber', ('INN', 'SNILS'), 'bankDetailsCardNumber', ('endDateOfResidencePermit', 'endDateOfRVP'))
         }),
         ('Данные паспорта', {
-            'fields': (('passportNumber','passportValidityPeriod'),'citizenship', 'passportIssuedBy', 'passportIssueDate')
+            'fields': (('passportNumber', 'passportValidityPeriod'), 'citizenship', 'passportIssuedBy', 'passportIssueDate')
         }),
         ('Данные о регистрации', {
-            'fields': ( 'registrationValidityPeriod','registrationAddress')
+            'fields': ('registrationValidityPeriod', 'registrationAddress')
         }),
         ('Данные из УФМС', {
             'fields': ('dateOfNotificationUFMSadmission', 'dateOfNotificationUFMSdischarge')
@@ -31,18 +35,53 @@ class EmployeeAdmin(ImportExportModelAdmin):
     )
     resource_class = EmployeeResource
 
+    def get_export_formats(self):
+        formats = (
+            base_formats.XLS,
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_export()]
+
+    def get_import_formats(self):
+        formats = (
+            base_formats.XLS,
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_import()]
+    # def get_queryset(self, request):
+    #     qs = super(EmployeeAdmin, self).get_queryset(request)
+    #     return qs.filter(deleted=False)
+
 
 class EmployeeInOrganizationResource(resources.ModelResource):
     """Ресурс сотрудника в организации для импорта"""
     class Meta:
         model = EmployeeInOrganization
 
+
 class EmployeeInOrganizationAdmin(ImportExportModelAdmin):
     """Работники, прикрепленные к организациям"""
     exclude = ('createdAt', 'updatedAt')
-    list_filter = ('tariff','organization__organizationName')
-    search_fields=('tariff__positionName','organization__organizationName')
+    list_filter = ('tariff', 'organization__organizationName')
+    search_fields = ('tariff__positionName', 'organization__organizationName')
     resource_class = EmployeeInOrganizationResource
+
+    def get_export_formats(self):
+        formats = (
+            base_formats.XLS,
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_export()]
+
+    def get_import_formats(self):
+        formats = (
+            base_formats.XLS,
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_import()]
+    # def get_queryset(self, request):
+    #     qs = super(EmployeeInOrganizationAdmin, self).get_queryset(request)
+    #     return qs.filter(deleted=False)
 
 
 admin.site.register(Employee, EmployeeAdmin)
