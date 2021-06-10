@@ -8,19 +8,13 @@ class Patent(models.Model):
         Employee, on_delete=models.CASCADE, verbose_name="ФИО сотрудника")
     dateOfPatentIssue = models.DateField("Дата выдачи патента")
     dateExpirationPatent = models.DateField("Дата окончания патента")
-    deleted = models.BooleanField("Удалено", default=False)
-
+    patentSeries = models.CharField("Серия патента", max_length=15)
+    patentNumber = models.CharField("Номер патента", max_length=12)
+    createdAt = models.DateTimeField(auto_now_add=True)
+    updatedAt = models.DateTimeField(auto_now=True)
+   
     def __str__(self):
         return f"Патент {self.employee.fullNameInGenetive} от {self.dateOfPatentIssue}"
-
-    def delete(self, *args, **kwargs):
-        if self.deleted == False:
-            self.deleted = True
-            self.save()
-        else: 
-            print('No, man, I have already deleted! Give up!')
-
-    
 
     class Meta:
         verbose_name = "Патент"
@@ -33,6 +27,8 @@ class PatentPaymentReceipt(models.Model):
         Patent, on_delete=models.CASCADE, verbose_name="Информация о патенте")
     paymentTermFrom = models.DateField("Срок оплаты патента от")
     paymentTermUntil = models.DateField("Срок оплаты патента до")
+    createdAt = models.DateTimeField(auto_now_add=True)
+    updatedAt = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f'Квитанция об оплате "{self.patent}"'
@@ -41,6 +37,6 @@ class PatentPaymentReceipt(models.Model):
         verbose_name = "Квитанция оплаты патента"
         verbose_name_plural = "Квитанции оплаты патентов"
 
-    def clean(self):
-        if self.paymentTermFrom > self.paymentTermUntil:
-            raise ValidationError("Начало срока оплаты патента превышает его окончание")
+    # def clean(self):
+    #     if self.paymentTermFrom > self.paymentTermUntil:
+    #         raise ValidationError("Начало срока оплаты патента превышает его окончание")
