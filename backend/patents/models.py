@@ -37,6 +37,6 @@ class PatentPaymentReceipt(models.Model):
         verbose_name = "Квитанция оплаты патента"
         verbose_name_plural = "Квитанции оплаты патентов"
 
-    def clean(self):
-        if self.paymentTermFrom > self.paymentTermUntil:
-            raise ValidationError("Начало срока оплаты патента превышает его окончание")
+    # def clean(self):
+    #     if self.paymentTermFrom > self.paymentTermUntil:
+    #         raise ValidationError("Начало срока оплаты патента превышает его окончание")

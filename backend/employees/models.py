@@ -42,9 +42,9 @@ class Employee(models.Model):
         verbose_name = "Работник"
         verbose_name_plural = "Работники"
 
-    def clean(self):
-        if self.dateOfNotificationUFMSadmission > self.dateOfNotificationUFMSdischarge:
-            raise ValidationError("Дата уведомления о приеме превышает даты при увольнении")
+    # def clean(self):
+    #     if self.dateOfNotificationUFMSadmission > self.dateOfNotificationUFMSdischarge:
+    #         raise ValidationError("Дата уведомления о приеме превышает даты при увольнении")
 
 
 class EmployeeInOrganization(models.Model):
