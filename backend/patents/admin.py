@@ -13,25 +13,22 @@ class PatentPaymentReceiptInline(admin.TabularInline):
     model = PatentPaymentReceipt
     extra = 1
 
-
 class PatentResource(resources.ModelResource):
     """Ресурс для импорта-экспорта патентов"""
     class Meta:
         model = Patent
 
-
 class PatentAdmin(ImportExportModelAdmin):
     """Патенты"""
-    search_fields = ('employee__fullName', 'dateOfPatentIssue',
+    search_fields = ('employee__fullName', 'dateOfPatentIssue', 'dateExpirationPatent',
                      'patentpaymentreceipt__paymentTermUntil')
     inlines = [PatentPaymentReceiptInline]
     # Поиск по дате выдачи патента и даты оплаты "до" пока осуществляется в формате YYYY-MM-dd
     resource_class = PatentResource
-    actions = ["makeDeleted", ]
 
     def get_queryset(self, request):
         qs = super(PatentAdmin, self).get_queryset(request)
-        qs = qs.filter(deleted=False).annotate(_last_payment_receipt=Max(
+        qs = qs.annotate(_last_payment_receipt=Max(
             "patentpaymentreceipt__paymentTermUntil", output_field=DateField())).order_by('_last_payment_receipt')
         return qs
 
@@ -50,26 +47,6 @@ class PatentAdmin(ImportExportModelAdmin):
         else:
             return "-"
 
-    def makeDeleted(self, request, queryset):
-        row_update = 0
-        for obj in queryset:
-            obj.deleted = True
-            obj.save()
-            row_update += 1
-        if row_update == 1:
-            message_bit = "1 запись была удалена"
-        else:
-            message_bit = f"{row_update} записей были удалены"
-        self.message_user(request, f"{message_bit}")
-
-# def delete_model(modeladmin, request, queryset):
-#     for obj in queryset:
-#         filename=obj.profile_name+".xml"
-#         os.remove(os.path.join(obj.type,filename))
-#         obj.delete()
-
-    makeDeleted.short_description = "Удалить выбранные патенты"
-    makeDeleted.allowed_permissions = ('delete', )
 
     last_payment_receipt.short_description = "Оплачен до"
     last_payment_receipt.admin_order_field = '_last_payment_receipt'
@@ -91,7 +68,7 @@ class PatentPaymentReceiptAdmin(ImportExportModelAdmin):
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "patent":
-            kwargs["queryset"] = Patent.objects.filter(deleted=False)
+            kwargs["queryset"] = Patent.objects
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
