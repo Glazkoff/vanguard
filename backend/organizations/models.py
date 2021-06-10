@@ -40,7 +40,7 @@ class Tariff(models.Model):
         City, on_delete=models.CASCADE, verbose_name="Город организации")
 
     positionName = models.CharField("Название должности", max_length=150)
-    salaryPerHour = models.PositiveIntegerField("Заработная плата в час", validators=[int_list_validator( sep = '' , message = "ИНН должен содержать только цифры" , code = 'invalid' , allow_negative = False )])
+    salaryPerHour = models.PositiveIntegerField("Заработная плата ₽ в час", validators=[int_list_validator( sep = '' , message = "ИНН должен содержать только цифры" , code = 'invalid' , allow_negative = False )])
     kitchenOrHall = models.CharField("Область работы (кухня, зал)", max_length=15, choices=PLACE_CHOICES)
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
