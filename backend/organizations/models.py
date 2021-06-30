@@ -1,9 +1,10 @@
 from django.db import models
 from django.core.validators import int_list_validator
 
+
 class City(models.Model):
     """Город"""
-    cityName = models.TextField("Название города")
+    cityName = models.CharField("Название города", max_length=150)
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
 
@@ -24,7 +25,7 @@ class Organization(models.Model):
         City, on_delete=models.CASCADE, verbose_name="Город организации")
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
-   
+
     def __str__(self):
         return self.organizationName
 
@@ -35,13 +36,15 @@ class Organization(models.Model):
 
 class Tariff(models.Model):
     """Тариф"""
-    PLACE_CHOICES = (('kitchen', 'Место на кухне'),('hall', 'Место в зале'))
+    PLACE_CHOICES = (('kitchen', 'Место на кухне'), ('hall', 'Место в зале'))
     city = models.ForeignKey(
         City, on_delete=models.CASCADE, verbose_name="Город организации")
 
     positionName = models.CharField("Название должности", max_length=150)
-    salaryPerHour = models.PositiveIntegerField("Заработная плата ₽ в час", validators=[int_list_validator( sep = '' , message = "ИНН должен содержать только цифры" , code = 'invalid' , allow_negative = False )])
-    kitchenOrHall = models.CharField("Область работы (кухня, зал)", max_length=15, choices=PLACE_CHOICES)
+    salaryPerHour = models.PositiveIntegerField("Заработная плата ₽ в час", validators=[int_list_validator(
+        sep='', message="ИНН должен содержать только цифры", code='invalid', allow_negative=False)])
+    kitchenOrHall = models.CharField(
+        "Область работы (кухня, зал)", max_length=15, choices=PLACE_CHOICES)
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
 
