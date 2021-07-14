@@ -5,6 +5,7 @@ from .models import Employee, EmployeeInOrganization
 from admin_interface.models import Theme
 from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
 from import_export.formats import base_formats
+from django.utils.html import format_html
 
 
 class EmployeeResource(resources.ModelResource):
@@ -52,6 +53,15 @@ class EmployeeAdmin(ImportExportModelAdmin):
     #     qs = super(EmployeeAdmin, self).get_queryset(request)
     #     return qs.filter(deleted=False)
 
+    def action_set(self, obj):
+        tag_string = f'<a style="margin-bottom: 1rem;" href="/api/documents">Сформировать документ</a>'
+        tag_string += f'<br /><a style="margin-bottom: 1rem;" href="/api/documents_m">Сформировать много документов</a>'
+        return format_html(tag_string)
+
+    action_set.short_description = "Действия"
+    # action_set.admin_order_field = '_last_payment_receipt'
+    list_display = ('fullName', 'action_set')
+
 
 class EmployeeInOrganizationResource(resources.ModelResource):
     """Ресурс сотрудника в организации для импорта"""
@@ -90,3 +100,5 @@ admin.site.unregister(Theme)
 admin.site.site_title = "Авангард"
 admin.site.site_header = "Авангард"
 admin.site.index_title = "Авангард"
+admin.site.index_template = "admin/custom_index.html"
+admin.autodiscover()
