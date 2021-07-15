@@ -21,6 +21,8 @@ def go_through_patents():
 
                 def notification():
                     _ = patent.employee
+                    print("!!!")
+                    print(_)
                     return '<a href="/admin/patents/patent/'+str(patent.id)+'/change/">Патент #'+str(_.id)+'</a> сотрудника <a href="/admin/employees/employee/'+str(_.id)+'/change/">'+_.fullNameInGenetive+'</a> оплачен только до '+formatPatentExpirency+"!"
                 admin_notifications.register(notification)
     return notifications

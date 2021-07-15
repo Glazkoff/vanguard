@@ -54,8 +54,12 @@ class EmployeeAdmin(ImportExportModelAdmin):
     #     return qs.filter(deleted=False)
 
     def action_set(self, obj):
-        tag_string = f'<a style="margin-bottom: 1rem;" href="/api/documents">Сформировать документ</a>'
-        tag_string += f'<br /><a style="margin-bottom: 1rem;" href="/api/documents_m">Сформировать много документов</a>'
+        tag_string = f'<a target="_blank" href="/api/documents">Сформировать документ</a>'
+        tag_string += f'<br /><a target="_blank" href="/api/documents_m">Сформировать много документов</a>'
+        employeeInOrganizations = EmployeeInOrganization.objects.filter(
+            employee=obj)
+        for empInOrg in employeeInOrganizations:
+            tag_string += f'<br /><a target="_blank" style="margin-bottom: 1rem;" href="/api/documents/labor_contract/{empInOrg.id}">Сформировать трудовой договор ({empInOrg.tariff.positionName})</a>'
         return format_html(tag_string)
 
     action_set.short_description = "Действия"
