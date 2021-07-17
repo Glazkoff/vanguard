@@ -28,7 +28,7 @@ def go_through_patents():
     return notifications
 
 
-notif_list = go_through_patents()
+# notif_list = go_through_patents()
 
 
 # for _ in notif_list:

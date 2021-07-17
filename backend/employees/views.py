@@ -13,6 +13,7 @@ from .models import Employee, EmployeeInOrganization
 from docxtpl import DocxTemplate
 from django.template import defaultfilters
 from number_to_string import get_string_by_number
+from itertools import accumulate 
 
 APP_ROOT = os.path.abspath(os.path.dirname(__file__))
 
@@ -127,6 +128,124 @@ def labor_contract(request, employee_in_org_id):
     filename = f"Трудовой_договор_{employee.fullNameInGenetive}_{now}"
     filename = escape_uri_path(filename)
     response["Content-Disposition"] = f"attachment; filename={filename}.doc"
+    response["Content-Type"] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+
+    return response
+
+@login_required(login_url='/admin')
+def mia_notifications_admission(request):
+    # os.path.dirname(employees.__file__)
+    doc = DocxTemplate(os.path.join(
+        APP_ROOT, "docs", "mia_notification_admission.docx"))
+    # Получить:
+    # - [%] surname - фамилия
+    # - [%] name - имя
+    # - [%] patronymic - отчество
+    # - [] citizenship - гражданство
+    # - [] birthplace - место рождения
+    # - [] birthday - дата рождения
+    # - [%] identity_document - название документа, удостоверяющий личность (ДУЛ)
+    # - [%] identity_document_series - серия документа (ДУЛ)
+    # - [] identity_document_number - номер документа (ДУЛ)
+    # - [] identity_document_issue_date - дата выдачи документа (ДУЛ)
+    # - [] identity_document_issued_by - кем выдан документ (ДУЛ)
+    # - [] working_document - наименование документа об обосновании на прием (ОП)
+    # - [] working_document_series - серия документа (ОП)
+    # - [] working_document_number - номер документа (ОП)
+    # - [] working_document_issue_date - дата выдачи документа (ОП)
+    # - [] working_document_issued_by - кем выдан документ (ОП)
+    # - [] working_document_term_from - срок действия документа от (ОП)
+    # - [] working_document_term_until - срок действия документа до (ОП)
+    # - [] contract - на основании какого документа работает (ТД или ГПХ)
+    # - [] contract_start_date - дата заключение (ТД или ГПХ)
+    # - [] legal_organization_address - адрес организации
+
+    # - Отсутствуют в БД:
+    # - [] Наименование МВД
+    # - [] Документ на трудовую деятельность
+    # - [] Название профессии (возможно, нужно какое-то особое название для уведомлений)
+
+    # Разделение тексовых данных на элементы
+    def split_data(data,count_col):
+        data_up = data.upper()
+        data_split = list(data_up)
+        count_data_split = len(data_split)
+        for i in range(count_col-count_data_split):
+            data_split.append(' ')
+        return data_split
+
+    # Получения дня из даты
+    def split_day(date):
+        date_split = date.split(".")
+        day = list(date_split[0])
+        return day 
+
+    # Получения месяца из даты
+    def split_month(date):
+        date_split = date.split(".")
+        month = list(date_split[1])
+        return month
+
+    # Получения года из даты
+    def split_year(date):
+        date_split = date.split(".")
+        year = list(date_split[2])
+        return year
+
+    # Разделение данных на несколько строк
+    def split_data_rows (data, count_col,number_row):
+        data_up = data.upper()
+        data_split = list(data_up)
+        count_data_split = len(data_split)
+        length_to_split = [count_col, count_col, count_col]
+        Output = [data_split[x - y: x] for x, y in zip(accumulate(length_to_split), length_to_split)]
+        for i in range(len(Output)):
+            if (len(Output[i])<34):
+                for k in range(34-len(Output[i])):
+                    Output[i].append(' ')
+        return Output[number_row-1]
+
+    # Проверка работает ли сотрудник по ТД
+    def contract_check(contract_number):
+        mark_contract = " "
+        if (contract_number == " "):
+            mark_contract = " "
+            return mark_contract
+        if (contract_number != " "):
+            mark_contract = "X"
+            return mark_contract
+    
+    # Проверка работает ли сотрудник по ГПХ
+    def gph_contract_check(gph_contract_number):
+        mark_gph_contract = " "
+        if (gph_contract_number == " "):
+            mark_gph_contract = " "
+            return mark_gph_contract
+        if (gph_contract_number != " "):
+            mark_gph_contract = "X"
+            return mark_gph_contract
+
+    context = {
+    'tbl_contents': [
+        {'cols': contract_check(contract_number=" ")}
+    ],
+    'tbl_contents1': [
+        {'cols': gph_contract_check(gph_contract_number=1111111111)}
+    ],
+    
+}
+
+    doc.render(context)
+    doc_io = io.BytesIO() 
+    doc.save(doc_io)
+    doc_io.seek(0)
+
+    response = HttpResponse(doc_io.read())
+
+    # Content-Disposition header makes a file downloadable
+    response["Content-Disposition"] = "attachment; filename=generated_doc.docx"
+
+    # Set the appropriate Content-Type for docx file
     response["Content-Type"] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 
     return response
