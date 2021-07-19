@@ -94,16 +94,16 @@ def labor_contract(request, employee_in_org_id):
             pk=employee_in_org_id)
         employee = Employee.objects.get(pk=employeeInOrg.employee.id)
         employee_work_place = ""
-        if employeeInOrg.tariff.kitchenOrHall == "kitchen":
-            employee_work_place += "кухня"
-        else:
-            employee_work_place += "зал"
+        # if employeeInOrg.tariff.kitchenOrHall == "kitchen":
+        #     employee_work_place += "кухня"
+        # else:
+        #     employee_work_place += "зал"
         context = {
             'contract_number': employeeInOrg.employmentContractNumber,
             'today': defaultfilters.date(datetime.datetime.today(), '«d» E Y г.'),
             'employee_citizenship': employee.citizenship,
             'employee_full_name': employee.fullName,
-            'employee_work_place': employee_work_place,
+            'employee_work_place': employeeInOrg.organization.legalOrganizationAddress,
             'work_start_date': defaultfilters.date(employeeInOrg.admissionDate, '«d» E Y г.'),
             'tariff': employeeInOrg.tariff.salaryPerHour,
             'tariff_by_words': get_string_by_number(employeeInOrg.tariff.salaryPerHour),
@@ -127,6 +127,45 @@ def labor_contract(request, employee_in_org_id):
     filename = f"Трудовой_договор_{employee.fullNameInGenetive}_{now}"
     filename = escape_uri_path(filename)
     response["Content-Disposition"] = f"attachment; filename={filename}.doc"
+    response["Content-Type"] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+
+    return response
+
+@login_required(login_url='/admin')
+def gph_contract(request, employee_in_org_id):
+    doc = DocxTemplate(os.path.join(
+        APP_ROOT, "docs", "gph.docx"))
+    try:
+        employeeInOrg = EmployeeInOrganization.objects.get(
+            pk=employee_in_org_id)
+        employee = Employee.objects.get(pk=employeeInOrg.employee_id)
+        context = {
+            'employee_full_name': employee.fullName,
+            'today': defaultfilters.date(datetime.datetime.today(), '«d» E Y г.'),
+            'employee_work_place': employeeInOrg.organization.legalOrganizationAddress,
+            'end_date_gph_contract': defaultfilters.date(employeeInOrg.endDateOfGPHContract, 'd E Y г.'),
+            'employee_passport_number': employee.passportNumber,
+            'employee_passport_issued_by': employee.passportIssuedBy,
+            'employee_passport_date_of_issue': defaultfilters.date(employee.passportIssueDate, 'd E Y г.'),
+            'employee_registration_address': employee.registrationAddress,
+            'employee_inn': employee.INN, 
+            'employee_phone': employee.phoneNumber
+        }
+    except EmployeeInOrganization.DoesNotExist:
+        html = "<html><body><h1 style='font-family: sans-serif;'>Работник в организации не найден!</h1></body></html>"
+        return HttpResponse(html)
+
+    doc.render(context)
+    doc_io = io.BytesIO()
+    doc.save(doc_io)
+    doc_io.seek(0)
+
+    response = HttpResponse(doc_io.read())
+
+    now = datetime.datetime.now().strftime("%d.%m.%Y_%H-%M-%S")
+    filename = f"Договор_ГПХ_{employee.fullNameInGenetive}_{now}"
+    filename = escape_uri_path(filename)
+    response["Content-Disposition"] = f"attachment; filename={filename}.docx"
     response["Content-Type"] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 
     return response
