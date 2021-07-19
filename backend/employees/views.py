@@ -138,7 +138,7 @@ def gph_contract(request, employee_in_org_id):
     try:
         employeeInOrg = EmployeeInOrganization.objects.get(
             pk=employee_in_org_id)
-        employee = Employee.objects.get(pk=employeeInOrg.employee.id)
+        employee = Employee.objects.get(pk=employeeInOrg.employee_id)
         context = {
             'employee_full_name': employee.fullName,
             'today': defaultfilters.date(datetime.datetime.today(), '«d» E Y г.'),
