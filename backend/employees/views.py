@@ -19,7 +19,6 @@ APP_ROOT = os.path.abspath(os.path.dirname(__file__))
 
 @login_required(login_url='/admin')
 def doc_test(request):
-    # os.path.dirname(employees.__file__)
     doc = DocxTemplate(os.path.join(
         APP_ROOT, "docs", "test_1.docx"))
     # ... your other code ...
