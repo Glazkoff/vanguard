@@ -11,3 +11,5 @@ docxtpl
 python-docx
 jinja2
 number_to_string
+gunicorn
+gevent
