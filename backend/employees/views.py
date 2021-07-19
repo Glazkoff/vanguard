@@ -165,13 +165,28 @@ def mia_notifications_admission(request):
     # - [] Документ на трудовую деятельность
     # - [] Название профессии (возможно, нужно какое-то особое название для уведомлений)
 
+    # - Таблицы в шаблоне:
+    # - [X] mia_name_contents - название МВД (несколько строк,34 символа)
+    # - [X] surname_contents - фамилия работника (одна строка,28 символов)
+    # - [X] name_contents - имя работника (одна строка,28 символов)
+    # - [X] patronymic_contents - отчетсво работника (одна строка,28 символов)
+    # - [X] citizenship_contents - гражданство работника (одна строка,27 символов)
+    # - [X] birthplace_contents - место рождения работника (несколько строк,24 символов)
+    # - [X] birth_day_contents - день рождения работника 
+    # - [X] birth_month_contents - месяц рождения работника 
+    # - [X] birth_year_contents - год рождения работника 
+    # - [X] type_identity_document_contents - отчетсво работника (одна строка,19 символов)
+
+    # - [] patronymic_contents - отчетсво работника (одна строка,28 символов)
+    # - [] patronymic_contents - отчетсво работника (одна строка,28 символов)
+
     # Разделение тексовых данных на элементы
     def split_data(data,count_col):
         data_up = data.upper()
         data_split = list(data_up)
         count_data_split = len(data_split)
         for i in range(count_col-count_data_split):
-            data_split.append(' ')
+            data_split.append('  ')
         return data_split
 
     # Получения дня из даты
@@ -198,14 +213,14 @@ def mia_notifications_admission(request):
         data_split = list(data_up)
         count_data_split = len(data_split)
         length_to_split = [count_col, count_col, count_col]
-        Output = [data_split[x - y: x] for x, y in zip(accumulate(length_to_split), length_to_split)]
-        for i in range(len(Output)):
-            if (len(Output[i])<34):
-                for k in range(34-len(Output[i])):
-                    Output[i].append(' ')
-        return Output[number_row-1]
+        output_data = [data_split[x - y: x] for x, y in zip(accumulate(length_to_split), length_to_split)]
+        for i in range(len(output_data)):
+            if (len(output_data[i])<count_col):
+                for k in range(count_col-len(output_data[i])):
+                    output_data[i].append('  ')
+        return output_data[number_row-1]
 
-    # Проверка работает ли сотрудник по ТД
+    # Проверка работает ли сотрудник по ТД или по ГПХ
     def contract_check(contract_number):
         mark_contract = " "
         if (contract_number == " "):
@@ -214,25 +229,42 @@ def mia_notifications_admission(request):
         if (contract_number != " "):
             mark_contract = "X"
             return mark_contract
-    
-    # Проверка работает ли сотрудник по ГПХ
-    def gph_contract_check(gph_contract_number):
-        mark_gph_contract = " "
-        if (gph_contract_number == " "):
-            mark_gph_contract = " "
-            return mark_gph_contract
-        if (gph_contract_number != " "):
-            mark_gph_contract = "X"
-            return mark_gph_contract
 
     context = {
-    'tbl_contents': [
-        {'cols': contract_check(contract_number=" ")}
+    'mia_name_contents': [
+        {'cols': split_data_rows("овм му мвд россии балашихинское",count_col = 34,number_row = 1)},
+        {'cols': split_data_rows("овм му мвд россии балашихинское",count_col = 34,number_row = 2)},
+        {'cols': split_data_rows("овм му мвд россии балашихинское",count_col = 34,number_row = 3)},
     ],
-    'tbl_contents1': [
-        {'cols': gph_contract_check(gph_contract_number=1111111111)}
+    'surname_contents': [
+        {'cols': split_data("Иванов",28)}
     ],
-    
+    'name_contents': [
+        {'cols': split_data("Иван",28)}
+    ],
+    'patronymic_contents': [
+        {'cols': split_data("Иванович",28)}
+    ],
+    'citizenship_contents': [
+        {'cols': split_data("кыргызская республика",27)}
+    ],
+    'birthplace_contents': [
+        {'cols': split_data_rows("кыргызская республика г.Бишкек",count_col = 24,number_row = 1)},
+        {'cols': split_data_rows("кыргызская республика г.Бишкек",count_col = 24,number_row = 2)},
+        {'cols': split_data_rows("кыргызская республика г.Бишкек",count_col = 24,number_row = 3)},
+    ],
+    'birth_day_contents': [
+        {'cols': split_day("20.09.2000")}
+    ],
+    'birth_mouth_contents': [
+        {'cols': split_month("20.09.2000")}
+    ],
+    'birth_year_contents': [
+        {'cols': split_year("20.09.2000")}
+    ],
+    'type_identity_document_contents': [
+        {'cols': split_data("паспорт",19)}
+    ],
 }
 
     doc.render(context)
@@ -242,10 +274,10 @@ def mia_notifications_admission(request):
 
     response = HttpResponse(doc_io.read())
 
-    # Content-Disposition header makes a file downloadable
-    response["Content-Disposition"] = "attachment; filename=generated_doc.docx"
-
-    # Set the appropriate Content-Type for docx file
+    now = datetime.datetime.now().strftime("%d.%m.%Y_%H-%M-%S")
+    filename = f"Уведомление_МВД_о_приеме_сотрудника_{now}"
+    filename = escape_uri_path(filename)
+    response["Content-Disposition"] = f"attachment; filename={filename}.doc"
     response["Content-Type"] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 
     return response
