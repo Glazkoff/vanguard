@@ -15,10 +15,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-import admin_notifications
 import employees.urls
 
-admin_notifications.autodiscover()
+
 admin.site.index_title = 'Информационная система "Авангард"'
 admin.site.site_title = "Авангард"
 admin.site.site_url = ""
