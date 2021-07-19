@@ -1,0 +1,25 @@
+{% extends "admin/app_index.html" %}<br />
+{% load notification_tag %}<br />
+{% block extrahead %}
+<style>
+  #content-related {
+    background: unset !important;
+  }
+</style>
+{% endblock %} {% block content %}<br />
+{{ block.super }}
+<div id="content-related">
+  <div>
+    <h1>Уведомления</h1>
+    {% error_notifications %}
+  </div>
+</div>
+{% endblock %}<br />
+{% block sidebar %}{{ block.super }}
+<div style="display: none">
+  <h1>Ссылки</h1>
+  <a href="/api/documents/">Ссылка на пример одного файла</a><br />
+  <a href="/api/documents_m/">Ссылка на пример архива файлов</a>
+  <br />
+</div>
+{% endblock %}

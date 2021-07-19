@@ -45,7 +45,9 @@ INSTALLED_APPS = [
     'import_export',
     'employees',
     'organizations',
-    'patents'
+    'patents',
+    'rangefilter',
+    'admin_notifications'
 ]
 
 IMPORT_EXPORT_IMPORT_PERMISSION_CODE = 'add'
@@ -152,3 +154,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # MEDIA CONFIGURATION
 MEDIA_ROOT = str(ROOT_DIR('media'))
 MEDIA_URL = '/media/'
+
+X_FRAME_OPTIONS = 'ALLOWALL'
+
+XS_SHARING_ALLOWED_METHODS = ['POST', 'GET', 'OPTIONS', 'PUT', 'DELETE']

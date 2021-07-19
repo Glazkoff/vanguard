@@ -6,6 +6,8 @@ from django.utils.html import format_html
 from django.template import defaultfilters
 from datetime import date, timedelta
 from django.db.models import Max, DateField
+from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
+from import_export.formats import base_formats
 
 
 class PatentPaymentReceiptInline(admin.TabularInline):
@@ -13,10 +15,12 @@ class PatentPaymentReceiptInline(admin.TabularInline):
     model = PatentPaymentReceipt
     extra = 1
 
+
 class PatentResource(resources.ModelResource):
     """Ресурс для импорта-экспорта патентов"""
     class Meta:
         model = Patent
+
 
 class PatentAdmin(ImportExportModelAdmin):
     """Патенты"""
@@ -25,6 +29,20 @@ class PatentAdmin(ImportExportModelAdmin):
     inlines = [PatentPaymentReceiptInline]
     # Поиск по дате выдачи патента и даты оплаты "до" пока осуществляется в формате YYYY-MM-dd
     resource_class = PatentResource
+
+    def get_export_formats(self):
+        formats = (
+            base_formats.XLS,
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_export()]
+
+    def get_import_formats(self):
+        formats = (
+            base_formats.XLS,
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_import()]
 
     def get_queryset(self, request):
         qs = super(PatentAdmin, self).get_queryset(request)
@@ -47,7 +65,6 @@ class PatentAdmin(ImportExportModelAdmin):
         else:
             return "-"
 
-
     last_payment_receipt.short_description = "Оплачен до"
     last_payment_receipt.admin_order_field = '_last_payment_receipt'
     list_display = ('employee', 'dateOfPatentIssue', 'last_payment_receipt')
@@ -61,15 +78,34 @@ class PatentPaymentReceiptResource(resources.ModelResource):
 
 class PatentPaymentReceiptAdmin(ImportExportModelAdmin):
     """Квитанция оплаты патента"""
-    list_display = ('patent', 'paymentTermFrom', 'paymentTermUntil')
+    list_display = ('receipt_number', 'patent',
+                    'paymentTermFrom', 'paymentTermUntil')
     search_fields = ('patent__employee__fullName',
                      'patent__dateOfPatentIssue', 'paymentTermFrom', 'paymentTermUntil')
     resource_class = PatentPaymentReceiptResource
+
+    def get_export_formats(self):
+        formats = (
+            base_formats.XLS,
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_export()]
+
+    def get_import_formats(self):
+        formats = (
+            base_formats.XLS,
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_import()]
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "patent":
             kwargs["queryset"] = Patent.objects
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+    def receipt_number(self, obj):
+        return f"Квитанция №{obj.id}"
+    receipt_number.short_description = 'Квитанция'
 
 
 admin.site.register(Patent, PatentAdmin)
