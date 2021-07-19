@@ -10,6 +10,8 @@ class Patent(models.Model):
     dateOfPatentIssue = models.DateField("Дата выдачи патента")
     dateExpirationPatent = models.DateField(
         "Дата окончания патента")
+    patentIssuedBy = models.TextField(
+        "Кем выдан патент", null=True, blank=True)
     patentSeries = models.CharField("Серия патента", max_length=15)
     patentNumber = models.CharField("Номер патента", max_length=12)
     createdAt = models.DateTimeField(auto_now_add=True)
