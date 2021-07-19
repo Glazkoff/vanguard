@@ -35,7 +35,7 @@ services:
   nginx:
     image: nginx:alpine
     ports:
-      - "8000:80"
+      - "8002:80"
     depends_on:
       - backend
     volumes:
