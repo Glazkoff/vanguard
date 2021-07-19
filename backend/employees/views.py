@@ -13,6 +13,7 @@ from .models import Employee, EmployeeInOrganization
 from docxtpl import DocxTemplate
 from django.template import defaultfilters
 from number_to_string import get_string_by_number
+from itertools import accumulate
 
 APP_ROOT = os.path.abspath(os.path.dirname(__file__))
 
@@ -130,6 +131,7 @@ def labor_contract(request, employee_in_org_id):
 
     return response
 
+
 @login_required(login_url='/admin')
 def gph_contract(request, employee_in_org_id):
     doc = DocxTemplate(os.path.join(
@@ -147,12 +149,170 @@ def gph_contract(request, employee_in_org_id):
             'employee_passport_issued_by': employee.passportIssuedBy,
             'employee_passport_date_of_issue': defaultfilters.date(employee.passportIssueDate, 'd E Y г.'),
             'employee_registration_address': employee.registrationAddress,
-            'employee_inn': employee.INN, 
+            'employee_inn': employee.INN,
             'employee_phone': employee.phoneNumber
         }
     except EmployeeInOrganization.DoesNotExist:
         html = "<html><body><h1 style='font-family: sans-serif;'>Работник в организации не найден!</h1></body></html>"
         return HttpResponse(html)
+
+    doc.render(context)
+    doc_io = io.BytesIO()
+
+    response = HttpResponse(doc_io.read())
+
+    now = datetime.datetime.now().strftime("%d.%m.%Y_%H-%M-%S")
+
+    filename = f"Договор_ГПХ_{employee.fullNameInGenetive}_{now}"
+    filename = escape_uri_path(filename)
+    response["Content-Disposition"] = f"attachment; filename={filename}.docx"
+
+    response["Content-Type"] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+
+    return response
+
+
+@login_required(login_url='/admin')
+def mia_notifications_admission(request):
+    # os.path.dirname(employees.__file__)
+    doc = DocxTemplate(os.path.join(
+        APP_ROOT, "docs", "mia_notification_admission.docx"))
+    # Получить:
+    # - [%] surname - фамилия
+    # - [%] name - имя
+    # - [%] patronymic - отчество
+    # - [] citizenship - гражданство
+    # - [] birthplace - место рождения
+    # - [] birthday - дата рождения
+    # - [%] identity_document - название документа, удостоверяющий личность (ДУЛ)
+    # - [%] identity_document_series - серия документа (ДУЛ)
+    # - [] identity_document_number - номер документа (ДУЛ)
+    # - [] identity_document_issue_date - дата выдачи документа (ДУЛ)
+    # - [] identity_document_issued_by - кем выдан документ (ДУЛ)
+    # - [] working_document - наименование документа об обосновании на прием (ОП)
+    # - [] working_document_series - серия документа (ОП)
+    # - [] working_document_number - номер документа (ОП)
+    # - [] working_document_issue_date - дата выдачи документа (ОП)
+    # - [] working_document_issued_by - кем выдан документ (ОП)
+    # - [] working_document_term_from - срок действия документа от (ОП)
+    # - [] working_document_term_until - срок действия документа до (ОП)
+    # - [] contract - на основании какого документа работает (ТД или ГПХ)
+    # - [] contract_start_date - дата заключение (ТД или ГПХ)
+    # - [] legal_organization_address - адрес организации
+
+    # - Отсутствуют в БД:
+    # - [] Наименование МВД
+    # - [] Документ на трудовую деятельность
+    # - [] Название профессии (возможно, нужно какое-то особое название для уведомлений)
+
+    # - Таблицы в шаблоне:
+    # - [X] mia_name_contents - название МВД (несколько строк,34 символа)
+    # - [X] surname_contents - фамилия работника (одна строка,28 символов)
+    # - [X] name_contents - имя работника (одна строка,28 символов)
+    # - [X] patronymic_contents - отчетсво работника (одна строка,28 символов)
+    # - [X] citizenship_contents - гражданство работника (одна строка,27 символов)
+    # - [X] birthplace_contents - место рождения работника (несколько строк,24 символов)
+    # - [X] birth_day_contents - день рождения работника
+    # - [X] birth_month_contents - месяц рождения работника
+    # - [X] birth_year_contents - год рождения работника
+    # - [X] type_identity_document_contents - отчетсво работника (одна строка,19 символов)
+
+    # - [] patronymic_contents - отчетсво работника (одна строка,28 символов)
+    # - [] patronymic_contents - отчетсво работника (одна строка,28 символов)
+
+    # Разделение тексовых данных на элементы
+    def split_data(data, count_col):
+        data_up = data.upper()
+        data_split = list(data_up)
+        count_data_split = len(data_split)
+        for i in range(count_col-count_data_split):
+            data_split.append('  ')
+        return data_split
+
+    # Получения дня из даты
+    def split_day(date):
+        date_split = date.split(".")
+        day = list(date_split[0])
+        return day
+
+    # Получения месяца из даты
+    def split_month(date):
+        date_split = date.split(".")
+        month = list(date_split[1])
+        return month
+
+    # Получения года из даты
+    def split_year(date):
+        date_split = date.split(".")
+        year = list(date_split[2])
+        return year
+
+    # Разделение данных на несколько строк
+    def split_data_rows(data, count_col, number_row):
+        data_up = data.upper()
+        data_split = list(data_up)
+        count_data_split = len(data_split)
+        length_to_split = [count_col, count_col, count_col]
+        output_data = [data_split[x - y: x]
+                       for x, y in zip(accumulate(length_to_split), length_to_split)]
+        for i in range(len(output_data)):
+            if (len(output_data[i]) < count_col):
+                for k in range(count_col-len(output_data[i])):
+                    output_data[i].append('  ')
+        return output_data[number_row-1]
+
+    # Проверка работает ли сотрудник по ТД или по ГПХ
+    def contract_check(contract_number):
+        mark_contract = " "
+        if (contract_number == " "):
+            mark_contract = " "
+            return mark_contract
+        if (contract_number != " "):
+            mark_contract = "X"
+            return mark_contract
+
+    context = {
+        'mia_name_contents': [
+            {'cols': split_data_rows(
+                "овм му мвд россии балашихинское", count_col=34, number_row=1)},
+            {'cols': split_data_rows(
+                "овм му мвд россии балашихинское", count_col=34, number_row=2)},
+            {'cols': split_data_rows(
+                "овм му мвд россии балашихинское", count_col=34, number_row=3)},
+        ],
+        'surname_contents': [
+            {'cols': split_data("Иванов", 28)}
+        ],
+        'name_contents': [
+            {'cols': split_data("Иван", 28)}
+        ],
+        'patronymic_contents': [
+            {'cols': split_data("Иванович", 28)}
+        ],
+        'citizenship_contents': [
+            {'cols': split_data("кыргызская республика", 27)}
+        ],
+        'birthplace_contents': [
+            {'cols': split_data_rows(
+                "кыргызская республика г.Бишкек", count_col=24, number_row=1)},
+            {'cols': split_data_rows(
+                "кыргызская республика г.Бишкек", count_col=24, number_row=2)},
+            {'cols': split_data_rows(
+                "кыргызская республика г.Бишкек", count_col=24, number_row=3)},
+        ],
+        'birth_day_contents': [
+            {'cols': split_day("20.09.2000")}
+        ],
+        'birth_mouth_contents': [
+            {'cols': split_month("20.09.2000")}
+        ],
+        'birth_year_contents': [
+            {'cols': split_year("20.09.2000")}
+        ],
+        'type_identity_document_contents': [
+            {'cols': split_data("паспорт", 19)}
+        ],
+    }
 
     doc.render(context)
     doc_io = io.BytesIO()
@@ -162,9 +322,10 @@ def gph_contract(request, employee_in_org_id):
     response = HttpResponse(doc_io.read())
 
     now = datetime.datetime.now().strftime("%d.%m.%Y_%H-%M-%S")
-    filename = f"Договор_ГПХ_{employee.fullNameInGenetive}_{now}"
+
+    filename = f"Уведомление_МВД_о_приеме_сотрудника_{now}"
     filename = escape_uri_path(filename)
-    response["Content-Disposition"] = f"attachment; filename={filename}.docx"
+    response["Content-Disposition"] = f"attachment; filename={filename}.doc"
     response["Content-Type"] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 
     return response
