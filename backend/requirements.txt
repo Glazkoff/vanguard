@@ -10,6 +10,4 @@ docx
 docxtpl
 python-docx
 jinja2
-# django-admin-notifications
--e git+https://github.com/andybak/django-admin-notifications@master#egg=django-admin-notifications
 number_to_string
