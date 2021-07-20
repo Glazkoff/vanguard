@@ -34,3 +34,4 @@ services:
       - ./backend/media/:/media/
       - ./backend/staticfiles/:/staticfiles/
       - ./nginx/prod.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/favicon/:/var/www/favicon/:ro
