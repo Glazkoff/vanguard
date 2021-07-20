@@ -6,6 +6,7 @@ from admin_interface.models import Theme
 from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
 from import_export.formats import base_formats
 from django.utils.html import format_html
+from django.shortcuts import render
 
 
 class EmployeeResource(resources.ModelResource):

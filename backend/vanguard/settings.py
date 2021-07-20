@@ -46,8 +46,7 @@ INSTALLED_APPS = [
     'employees',
     'organizations',
     'patents',
-    'rangefilter',
-    'admin_notifications'
+    'rangefilter'
 ]
 
 IMPORT_EXPORT_IMPORT_PERMISSION_CODE = 'add'
@@ -72,6 +71,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'employees.notifications.context_processor',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
