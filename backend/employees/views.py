@@ -242,7 +242,10 @@ def mia_notifications_admission(request, employee_in_org_id):
     full_name_split = employee.fullName.split()
     name_split_content = full_name_split[1]
     surname_split_content = full_name_split[0]
-    patronymic_split_content = full_name_split[2]
+    if len(full_name_split) == 3:
+        patronymic_split_content = full_name_split[2]
+    else:
+        patronymic_split_content = ' '
     contract_date = ' '
     if employeeInOrg.employmentContractNumber == None:
         contract_date = employeeInOrg.startDateOfGPHContract
