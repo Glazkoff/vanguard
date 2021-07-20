@@ -16,8 +16,7 @@ class Employee(models.Model):
     birthday = models.DateField("Дата рождения", validators=[MaxValueValidator(
         limit_value=date.today, message="Дата рождения не может превышать сегодняшнюю")])
     birthplace = models.CharField("Место рождения", max_length=120)
-    passportNumber = models.CharField("Номер паспорта", max_length=40, validators=[int_list_validator(
-        sep=' ', message="Неправильный вид номера паспорта", code='invalid', allow_negative=False)])
+    passportNumber = models.CharField("Номер паспорта", max_length=40)
     passportIssuedBy = models.TextField(
         "Кем выдан паспорт", null=True, blank=True)
     passportIssueDate = models.DateField("Дата выдачи паспорта")
