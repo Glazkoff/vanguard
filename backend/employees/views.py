@@ -195,7 +195,7 @@ def mia_notifications_admission(request,employee_in_org_id):
     
     employeeInOrg = EmployeeInOrganization.objects.get(
             pk=employee_in_org_id)
-    employee = Employee.objects.get(pk=employeeInOrg.employee.id)
+    employee = Employee.objects.get(pk=employeeInOrg.employee_id)
     organization = Organization.objects.get(pk=employeeInOrg.organization.id)
     full_name_split = employee.fullName.split()
     name_split_content = full_name_split[1]
