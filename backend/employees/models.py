@@ -16,8 +16,6 @@ class Employee(models.Model):
     birthday = models.DateField("Дата рождения", validators=[MaxValueValidator(
         limit_value=date.today, message="Дата рождения не может превышать сегодняшнюю")])
     birthplace = models.CharField("Место рождения", max_length=120)
-    city = models.ForeignKey(
-        City, on_delete=models.CASCADE, verbose_name="Город работы")
     passportNumber = models.CharField("Номер паспорта", max_length=40, validators=[int_list_validator(
         sep=' ', message="Неправильный вид номера паспорта", code='invalid', allow_negative=False)])
     passportIssuedBy = models.TextField(
@@ -40,8 +38,9 @@ class Employee(models.Model):
         "Дата уведомления УФМС при приёме", null=True, blank=True)
     dateOfNotificationUFMSdischarge = models.DateField(
         "Дата уведомления УФМС при увольнении", null=True, blank=True)
-    bankDetailsCardNumber = models.TextField(
-        "Номер банковской карты", null=True, blank=True)
+    bankDetailsCardNumber = models.CharField(
+        "Номер банковской карты", max_length=16, default="", blank=True
+    )
     endDateOfRVP = models.DateField(
         "Дата окончания РВП", null=True, blank=True)
     endDateOfResidencePermit = models.DateField(
@@ -66,6 +65,8 @@ class EmployeeInOrganization(models.Model):
     """Сотрудник в организации"""
     employee = models.ForeignKey(
         Employee, on_delete=models.CASCADE, verbose_name="ФИО сотрудника")
+    city = models.ForeignKey(
+        City, on_delete=models.CASCADE, verbose_name="Город работы")
     organization = models.ForeignKey(
         Organization, on_delete=models.CASCADE, verbose_name="Название организации")
     tariff = models.ForeignKey(
