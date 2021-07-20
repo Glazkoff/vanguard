@@ -23,6 +23,6 @@ admin.site.site_title = "Авангард"
 admin.site.site_url = ""
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('', admin.site.urls),
     path('api/', include(employees.urls))
 ]
