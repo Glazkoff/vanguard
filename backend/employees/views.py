@@ -14,6 +14,7 @@ from docxtpl import DocxTemplate
 from django.template import defaultfilters
 from number_to_string import get_string_by_number
 from itertools import accumulate 
+from organizations.models import Organization
 
 APP_ROOT = os.path.abspath(os.path.dirname(__file__))
 
@@ -133,7 +134,7 @@ def labor_contract(request, employee_in_org_id):
     return response
 
 @login_required(login_url='/admin')
-def mia_notifications_admission(request):
+def mia_notifications_admission(request,employee_in_org_id):
     # os.path.dirname(employees.__file__)
     doc = DocxTemplate(os.path.join(
         APP_ROOT, "docs", "mia_notification_admission.docx"))
@@ -151,7 +152,7 @@ def mia_notifications_admission(request):
     # - [] identity_document_issued_by - кем выдан документ (ДУЛ)
     # - [] working_document - наименование документа об обосновании на прием (ОП)
     # - [] working_document_series - серия документа (ОП)
-    # - [] working_document_number - номер документа (ОП)
+    # - [X] working_document_number - номер документа (ОП)
     # - [] working_document_issue_date - дата выдачи документа (ОП)
     # - [] working_document_issued_by - кем выдан документ (ОП)
     # - [] working_document_term_from - срок действия документа от (ОП)
@@ -175,10 +176,37 @@ def mia_notifications_admission(request):
     # - [X] birth_day_contents - день рождения работника 
     # - [X] birth_month_contents - месяц рождения работника 
     # - [X] birth_year_contents - год рождения работника 
-    # - [X] type_identity_document_contents - отчетсво работника (одна строка,19 символов)
+    # - [X] type_identity_document_contents - тип документа (ДУЛ) (одна строка,19 символов)
 
-    # - [] patronymic_contents - отчетсво работника (одна строка,28 символов)
-    # - [] patronymic_contents - отчетсво работника (одна строка,28 символов)
+    # - [X] series_identity_document_contents - серия документа (ДУЛ) (одна строка,7 символов)
+    # - [X] number_identity_document_contents - номер документа (ДУЛ) (одна строка,9 символов)
+    # - [X] identity_document_day_contents - день выдачи документа (ДУЛ)
+    # - [X] identity_document_month_contents - месяц выдачи документа (ДУЛ)
+    # - [X] identity_document_year_contents - год выдачи документа (ДУЛ)
+    # - [X] identity_document_issued_by_contents - кем выдан документ (ДУЛ) (несколько строк,28 символов)
+    # - [X] name_labor_activity_document_contents - название документа на трудовую деятельность (несколько строк,34 символа)
+    # - [X] name_profession_contents - название профессии (несколько строк,34 символа)
+    # - [X] contract_number_contents - номер ТД
+    # - [X] contract_gph_number_contents - номер ГПХ
+    # - [X] contract_start_day_contents - день заключения документа (ТД или ГПХ)
+    # - [X] contract_start_month_contents - месяц заключения документа (ТД или ГПХ)
+    # - [X] contract_start_year_contents - год заключения документа (ТД или ГПХ)
+    # - [X] legal_organization_address_contents - адрес организации (несколько строк,34 символа)
+    
+    employeeInOrg = EmployeeInOrganization.objects.get(
+            pk=employee_in_org_id)
+    employee = Employee.objects.get(pk=employeeInOrg.employee.id)
+    organization = Organization.objects.get(pk=employeeInOrg.organization.id)
+    full_name_split = employee.fullName.split()
+    name_split_content = full_name_split[1]
+    surname_split_content = full_name_split[0]
+    patronymic_split_content = full_name_split[2]
+    contract_date = ' '
+    if employeeInOrg.employmentContractNumber == None:
+        contract_date = employeeInOrg.startDateOfGPHContract
+    else: 
+        contract_date = employeeInOrg.employmentContractDate
+    
 
     # Разделение тексовых данных на элементы
     def split_data(data,count_col):
@@ -186,7 +214,7 @@ def mia_notifications_admission(request):
         data_split = list(data_up)
         count_data_split = len(data_split)
         for i in range(count_col-count_data_split):
-            data_split.append('  ')
+            data_split.append('   ')
         return data_split
 
     # Получения дня из даты
@@ -217,16 +245,16 @@ def mia_notifications_admission(request):
         for i in range(len(output_data)):
             if (len(output_data[i])<count_col):
                 for k in range(count_col-len(output_data[i])):
-                    output_data[i].append('  ')
+                    output_data[i].append('   ')
         return output_data[number_row-1]
 
     # Проверка работает ли сотрудник по ТД или по ГПХ
     def contract_check(contract_number):
         mark_contract = " "
-        if (contract_number == " "):
+        if (contract_number == None):
             mark_contract = " "
             return mark_contract
-        if (contract_number != " "):
+        if (contract_number != None):
             mark_contract = "X"
             return mark_contract
 
@@ -237,33 +265,83 @@ def mia_notifications_admission(request):
         {'cols': split_data_rows("овм му мвд россии балашихинское",count_col = 34,number_row = 3)},
     ],
     'surname_contents': [
-        {'cols': split_data("Иванов",28)}
+        {'cols': split_data(surname_split_content,28)}
     ],
     'name_contents': [
-        {'cols': split_data("Иван",28)}
+        {'cols': split_data(name_split_content,28)}
     ],
     'patronymic_contents': [
-        {'cols': split_data("Иванович",28)}
+        {'cols': split_data(patronymic_split_content,28)}
     ],
     'citizenship_contents': [
-        {'cols': split_data("кыргызская республика",27)}
+        {'cols': split_data(employee.citizenship,27)}
     ],
     'birthplace_contents': [
-        {'cols': split_data_rows("кыргызская республика г.Бишкек",count_col = 24,number_row = 1)},
-        {'cols': split_data_rows("кыргызская республика г.Бишкек",count_col = 24,number_row = 2)},
-        {'cols': split_data_rows("кыргызская республика г.Бишкек",count_col = 24,number_row = 3)},
+        {'cols': split_data_rows(employee.birthplace,count_col = 24,number_row = 1)},
+        {'cols': split_data_rows(employee.birthplace,count_col = 24,number_row = 2)},
+        {'cols': split_data_rows(employee.birthplace,count_col = 24,number_row = 3)},
     ],
     'birth_day_contents': [
-        {'cols': split_day("20.09.2000")}
+        {'cols': split_day(defaultfilters.date(employee.birthday, 'd.m.Y'))}
     ],
     'birth_mouth_contents': [
-        {'cols': split_month("20.09.2000")}
+        {'cols': split_month(defaultfilters.date(employee.birthday, 'd.m.Y'))}
     ],
     'birth_year_contents': [
-        {'cols': split_year("20.09.2000")}
+        {'cols': split_year(defaultfilters.date(employee.birthday, 'd.m.Y'))}
     ],
     'type_identity_document_contents': [
         {'cols': split_data("паспорт",19)}
+    ],
+    'series_identity_document_contents': [
+        {'cols': split_data("1234567",7)}
+    ],
+    'number_identity_document_contents': [
+        {'cols': split_data(employee.passportNumber,9)}
+    ],
+    'identity_document_day_contents': [
+        {'cols': split_day(defaultfilters.date(employee.passportIssueDate, 'd.m.Y'))}
+    ],
+    'identity_document_month_contents': [
+        {'cols': split_month(defaultfilters.date(employee.passportIssueDate, 'd.m.Y'))}
+    ],
+    'identity_document_year_contents': [
+        {'cols': split_year(defaultfilters.date(employee.passportIssueDate, 'd.m.Y'))}
+    ],
+    'identity_document_issued_by_contents': [
+        {'cols': split_data_rows(employee.passportIssuedBy,count_col = 28,number_row = 1)},
+        {'cols': split_data_rows(employee.passportIssuedBy,count_col = 28,number_row = 2)},
+        {'cols': split_data_rows(employee.passportIssuedBy,count_col = 28,number_row = 3)},
+    ],
+    'name_labor_activity_document_contents': [
+        {'cols': split_data_rows("Договор ЕАЭС от 29.04.2014",count_col = 34,number_row = 1)},
+        {'cols': split_data_rows("Договор ЕАЭС от 29.04.2014",count_col = 34,number_row = 2)},
+        {'cols': split_data_rows("Договор ЕАЭС от 29.04.2014",count_col = 34,number_row = 3)},
+    ],
+    'contract_number_contents': [
+        {'cols': contract_check(employeeInOrg.employmentContractNumber)}
+    ],
+    'contract_gph_number_contents': [
+        {'cols': contract_check(employeeInOrg.GPHContractNumber)}
+    ],
+    'contract_start_day_contents': [
+        {'cols': split_day(defaultfilters.date(contract_date, 'd.m.Y'))}
+    ],
+    'contract_start_mouth_contents': [
+        {'cols': split_month(defaultfilters.date(contract_date, 'd.m.Y'))}
+    ],
+    'contract_start_year_contents': [
+        {'cols': split_year(defaultfilters.date(contract_date, 'd.m.Y'))}
+    ],
+    'legal_organization_address_contents': [
+        {'cols': split_data_rows(organization.legalOrganizationAddress,count_col = 34,number_row = 1)},
+        {'cols': split_data_rows(organization.legalOrganizationAddress,count_col = 34,number_row = 2)},
+        {'cols': split_data_rows(organization.legalOrganizationAddress,count_col = 34,number_row = 3)},
+    ],
+    'name_profession_contents': [
+        {'cols': split_data_rows("Работник пб",count_col = 34,number_row = 1)},
+        {'cols': split_data_rows("Работник пб",count_col = 34,number_row = 2)},
+        {'cols': split_data_rows("Работник пб",count_col = 34,number_row = 3)},
     ],
 }
 
@@ -275,7 +353,7 @@ def mia_notifications_admission(request):
     response = HttpResponse(doc_io.read())
 
     now = datetime.datetime.now().strftime("%d.%m.%Y_%H-%M-%S")
-    filename = f"Уведомление_МВД_о_приеме_сотрудника_{now}"
+    filename = f"Уведомление_МВД_о_приеме_{employee.fullNameInGenetive}_{now}"
     filename = escape_uri_path(filename)
     response["Content-Disposition"] = f"attachment; filename={filename}.doc"
     response["Content-Type"] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"

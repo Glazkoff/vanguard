@@ -5,5 +5,5 @@ urlpatterns = [
     path('documents/', doc_test),
     path('documents_m/', doc_multiple_test),
     path('documents/labor_contract/<int:employee_in_org_id>/', labor_contract),
-    path('documents/mia_notifications_admission', mia_notifications_admission)
+    path('documents/mia_notifications_admission/<int:employee_in_org_id>/', mia_notifications_admission)
 ]
