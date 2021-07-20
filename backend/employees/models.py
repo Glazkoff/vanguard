@@ -38,7 +38,9 @@ class Employee(models.Model):
         "Дата уведомления УФМС при приёме", null=True, blank=True)
     dateOfNotificationUFMSdischarge = models.DateField(
         "Дата уведомления УФМС при увольнении", null=True, blank=True)
-    bankDetailsCardNumber = models.CharField("Номер банковской карты", max_length=16, null=True, blank=True) 
+    bankDetailsCardNumber = models.CharField(
+        "Номер банковской карты", max_length=16, default="", blank=True
+    )
     endDateOfRVP = models.DateField(
         "Дата окончания РВП", null=True, blank=True)
     endDateOfResidencePermit = models.DateField(
