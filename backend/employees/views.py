@@ -159,6 +159,8 @@ def gph_contract(request, employee_in_org_id):
 
     doc.render(context)
     doc_io = io.BytesIO()
+    doc.save(doc_io)
+    doc_io.seek(0)
 
     response = HttpResponse(doc_io.read())
 
