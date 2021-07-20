@@ -13,6 +13,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='patent',
             name='patentIssuedBy',
-            field=models.TextField(blank=True, default='', verbose_name='Кем выдан патент'),
+            field=models.TextField(
+                blank=True, default='', verbose_name='Кем выдан патент'),
         ),
     ]

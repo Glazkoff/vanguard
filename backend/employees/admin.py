@@ -63,6 +63,7 @@ class EmployeeAdmin(ImportExportModelAdmin):
         for empInOrg in employeeInOrganizations:
             tag_string += f'<a target="_blank" style="margin-bottom: 1rem;" href="/api/documents/labor_contract/{empInOrg.id}">Сформировать трудовой договор ({empInOrg.tariff.positionName})</a>'
             tag_string += f'<br /><a target="_blank" style="margin-bottom: 1rem;" href="/api/documents/mia_notifications_admission/{empInOrg.id}">Сформировать уведомление в МВД о приеме</a>'
+            tag_string += f'<br /><a target="_blank" style="margin-bottom: 1rem;" href="/api/documents/gph_contract/{empInOrg.id}">Сформировать договор ГПХ</a>'
         return format_html(tag_string)
 
     action_set.short_description = "Действия"
