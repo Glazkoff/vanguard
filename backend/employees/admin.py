@@ -70,7 +70,6 @@ class EmployeeAdmin(ImportExportModelAdmin):
     # action_set.admin_order_field = '_last_payment_receipt'
     list_display = ('fullName', 'action_set')
 
-
 class EmployeeInOrganizationResource(resources.ModelResource):
     """Ресурс сотрудника в организации для импорта"""
     class Meta:

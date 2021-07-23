@@ -29,7 +29,7 @@ class OrganizationAdmin(ImportExportModelAdmin):
     list_display = ("organizationName", "legalOrganizationAddress", "city")
     list_display_links = ("organizationName",)
     list_filter = ("city",)
-    search_fields = ("organizationName",)
+    search_fields = ("organizationName","postCodeOrganization",)
     ordering = ['-organizationName']
 
     def get_export_formats(self):
