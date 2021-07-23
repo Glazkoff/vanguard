@@ -99,11 +99,12 @@ def labor_contract(request, employee_in_org_id):
         #     employee_work_place += "кухня"
         # else:
         #     employee_work_place += "зал"
+        
         context = {
             'contract_number': employeeInOrg.employmentContractNumber,
             'today': defaultfilters.date(datetime.datetime.today(), '«d» E Y г.'),
             'employee_citizenship': employee.citizenship,
-            'employee_full_name': employee.fullName,
+            'employee_full_name': (f"{employee.surname} {employee.name} {employee.patronymic}", f"{employee.surname} {employee.name}")[employee.patronymic is None],
             'employee_work_place': employeeInOrg.organization.legalOrganizationAddress,
             'work_start_date': defaultfilters.date(employeeInOrg.admissionDate, '«d» E Y г.'),
             'tariff': employeeInOrg.tariff.salaryPerHour,
@@ -142,16 +143,20 @@ def gph_contract(request, employee_in_org_id):
             pk=employee_in_org_id)
         employee = Employee.objects.get(pk=employeeInOrg.employee_id)
         context = {
-            'employee_full_name': employee.fullName,
+            'employee_full_name': (f"{employee.surname} {employee.name} {employee.patronymic}", f"{employee.surname} {employee.name}")[employee.patronymic is None],
             'today': defaultfilters.date(datetime.datetime.today(), '«d» E Y г.'),
-            'employee_work_place': employeeInOrg.organization.legalOrganizationAddress,
-            'end_date_gph_contract': defaultfilters.date(employeeInOrg.endDateOfGPHContract, 'd E Y г.'),
-            'employee_passport_number': employee.passportNumber,
-            'employee_passport_issued_by': employee.passportIssuedBy,
-            'employee_passport_date_of_issue': defaultfilters.date(employee.passportIssueDate, 'd E Y г.'),
-            'employee_registration_address': employee.registrationAddress,
-            'employee_inn': employee.INN,
-            'employee_phone': employee.phoneNumber
+            'employee_work_place': (f"{employeeInOrg.organization.legalOrganizationAddress}", "")[employeeInOrg.organization.legalOrganizationAddress is None],
+            'end_date_gph_contract': (defaultfilters.date(employeeInOrg.endDateOfGPHContract, 'd E Y г.'), "")[employeeInOrg.endDateOfGPHContract is None],
+            'employee_passport_series':  (f"серия {employee.passportSeries}  № ", "")[employee.passportSeries is None], 
+            'employee_passport_number': (f"{employee.passportNumber}", "")[employee.passportNumber is None],
+            'employee_passport_issued_by': (f"{employee.passportIssuedBy}", "")[employee.passportIssuedBy is None],
+            'employee_passport_date_of_issue': (defaultfilters.date(employee.passportIssueDate, 'd E Y г.'), "")[employee.passportIssueDate is None],
+            'employee_registration_address': (f"{employee.registrationAddress}", "")[employee.registrationAddress is None],
+            'employee_inn': (f"{employee.INN}", "")[employee.INN is None],
+            'employee_phone': (f"{employee.phoneNumber}", "")[employee.phoneNumber is None], 
+            'tariff': (f"{employeeInOrg.tariff.salaryPerHour}", "")[employeeInOrg.tariff.salaryPerHour is None],
+            'tariff_by_words': (get_string_by_number(employeeInOrg.tariff.salaryPerHour), "")[employeeInOrg.tariff.salaryPerHour is None],
+            
         }
     except EmployeeInOrganization.DoesNotExist:
         html = "<html><body><h1 style='font-family: sans-serif;'>Работник в организации не найден!</h1></body></html>"
@@ -239,13 +244,17 @@ def mia_notifications_admission(request, employee_in_org_id):
         pk=employee_in_org_id)
     employee = Employee.objects.get(pk=employeeInOrg.employee_id)
     organization = Organization.objects.get(pk=employeeInOrg.organization_id)
-    full_name_split = employee.fullName.split()
-    name_split_content = full_name_split[1]
-    surname_split_content = full_name_split[0]
-    if len(full_name_split) == 3:
-        patronymic_split_content = full_name_split[2]
+    # full_name_split = employee.fullName.split()
+    # name_split_content = full_name_split[1]
+    # surname_split_content = full_name_split[0]
+    # if len(full_name_split) == 3:
+    #     patronymic_split_content = full_name_split[2]
+    # else:
+    #     patronymic_split_content = ' '
+    if employee.patronymic is None: 
+            local_patronymic = ""
     else:
-        patronymic_split_content = ' '
+            local_patronymic = employee.patronymic
     contract_date = ' '
     if employeeInOrg.employmentContractNumber == None:
         contract_date = employeeInOrg.startDateOfGPHContract
@@ -314,13 +323,13 @@ def mia_notifications_admission(request, employee_in_org_id):
                 "овм му мвд россии балашихинское", count_col=34, number_row=3)},
         ],
         'surname_contents': [
-            {'cols': split_data(surname_split_content, 28)}
+            {'cols': split_data(employee.surname, 28)}
         ],
         'name_contents': [
-            {'cols': split_data(name_split_content, 28)}
+            {'cols': split_data(employee.name, 28)}
         ],
         'patronymic_contents': [
-            {'cols': split_data(patronymic_split_content, 28)}
+            {'cols': split_data(local_patronymic, 28)}
         ],
         'citizenship_contents': [
             {'cols': split_data(employee.citizenship, 27)}

@@ -20,13 +20,13 @@ class EmployeeAdmin(ImportExportModelAdmin):
     exclude = ('createdAt', 'updatedAt')
     list_filter = ('birthday', 'citizenship', ('registrationValidityPeriod', DateRangeFilter), ('dateOfNotificationUFMSadmission', DateRangeFilter),
                    ('dateOfNotificationUFMSdischarge', DateRangeFilter), ('endDateOfResidencePermit', DateRangeFilter), ('endDateOfRVP', DateRangeFilter))
-    search_fields = ('fullName', 'fullNameInGenetive')
+    search_fields = ('name', 'surname', 'patronymic', 'fullNameInGenetive')
     fieldsets = (
         (None, {
-            'fields': (('fullName', 'fullNameInGenetive'), 'birthday', 'birthplace', 'phoneNumber', ('INN', 'SNILS'), 'bankDetailsCardNumber', ('endDateOfResidencePermit', 'endDateOfRVP'))
+            'fields': (('name', 'surname', 'patronymic', 'fullNameInGenetive'), 'birthday', 'birthplace', 'phoneNumber', ('INN', 'SNILS'), 'bankDetailsCardNumber', ('endDateOfResidencePermit', 'endDateOfRVP'))
         }),
         ('Данные паспорта', {
-            'fields': (('passportNumber', 'passportValidityPeriod'), 'citizenship', 'passportIssuedBy', 'passportIssueDate')
+            'fields': (('passportSeries','passportNumber', 'passportValidityPeriod'), 'citizenship', 'passportIssuedBy', 'passportIssueDate')
         }),
         ('Данные о регистрации', {
             'fields': ('registrationValidityPeriod', 'registrationAddress')
@@ -68,7 +68,7 @@ class EmployeeAdmin(ImportExportModelAdmin):
 
     action_set.short_description = "Действия"
     # action_set.admin_order_field = '_last_payment_receipt'
-    list_display = ('fullName', 'action_set')
+    list_display = ('__str__', 'action_set')
 
 
 class EmployeeInOrganizationResource(resources.ModelResource):

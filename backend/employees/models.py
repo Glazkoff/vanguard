@@ -9,13 +9,20 @@ from django.utils.translation import gettext_lazy as _
 
 class Employee(models.Model):
     """Работники"""
-    fullName = models.CharField("ФИО", max_length=120, validators=[RegexValidator(
-        regex=r'^[a-zA-Zа-яА-ЯёЁ -]+$', message="ФИО должно содержать только буквы", code=None, inverse_match=None, flags=0)])
+    # fullName = models.CharField("ФИО", max_length=120, validators=[RegexValidator(
+    #     regex=r'^[a-zA-Zа-яА-ЯёЁ -]+$', message="ФИО должно содержать только буквы", code=None, inverse_match=None, flags=0)])
+    name = models.CharField("Имя", max_length=30, validators=[RegexValidator(
+        regex=r'^[a-zA-Zа-яА-ЯёЁ -]+$', message="Имя может содержать только буквы или дефис", code=None, inverse_match=None, flags=0)])
+    surname = models.CharField("Фамилия", max_length=40, validators=[RegexValidator(
+        regex=r'^[a-zA-Zа-яА-ЯёЁ -]+$', message="Фамилия может содержать только буквы или дефис", code=None, inverse_match=None, flags=0)])
+    patronymic = models.CharField("Отчество", max_length=40, validators=[RegexValidator(
+        regex=r'^[a-zA-Zа-яА-ЯёЁ -]+$', message="Отчество может содержать только буквы или дефис", code=None, inverse_match=None, flags=0)], null=True, blank=True)
     fullNameInGenetive = models.CharField(
         "Родительный падеж ФИО", max_length=120, validators=[RegexValidator(regex=r'^[a-zA-Zа-яА-ЯёЁ -]+$', message="ФИО должно содержать только буквы", code=None, inverse_match=None, flags=0)])
     birthday = models.DateField("Дата рождения", validators=[MaxValueValidator(
         limit_value=date.today, message="Дата рождения не может превышать сегодняшнюю")])
     birthplace = models.CharField("Место рождения", max_length=120)
+    passportSeries = models.CharField("Серия паспорта", max_length=40, null=True, blank=True)
     passportNumber = models.CharField("Номер паспорта", max_length=40)
     passportIssuedBy = models.TextField(
         "Кем выдан паспорт", null=True, blank=True)
@@ -49,7 +56,13 @@ class Employee(models.Model):
     updatedAt = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.fullName
+        if self.patronymic is None: 
+            local_patronymic = ""
+        else:
+            local_patronymic = self.patronymic
+        return f"{self.surname} {self.name} {local_patronymic}"
+        
+
 
     class Meta:
         verbose_name = "Работник"
