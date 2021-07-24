@@ -72,7 +72,11 @@ class Employee(models.Model):
     #     if self.dateOfNotificationUFMSadmission > self.dateOfNotificationUFMSdischarge:
     #         raise ValidationError("Дата уведомления о приеме превышает даты при увольнении")
 
-
+REASON_WORK_SELECTION = [
+    ('P', 'Патент'),
+    ('EAEU', 'ЕАЭС'),
+    ('S', 'Обучение в России'),
+]
 class EmployeeInOrganization(models.Model):
     """Сотрудник в организации"""
     employee = models.ForeignKey(
@@ -100,6 +104,8 @@ class EmployeeInOrganization(models.Model):
         "Дата начала действия ГПХ Договора", null=True, blank=True)
     endDateOfGPHContract = models.DateField(
         "Дата окончания действия ГПХ Договора", null=True, blank=True)
+    reasonWorkEmployee = models.CharField(
+        verbose_name="Основание работы сотрудника", max_length=120, choices=REASON_WORK_SELECTION)
 
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
