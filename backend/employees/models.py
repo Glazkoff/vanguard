@@ -15,8 +15,21 @@ class Employee(models.Model):
         regex=r'^[a-zA-Zа-яА-ЯёЁ -]+$', message="Имя может содержать только буквы или дефис", code=None, inverse_match=None, flags=0)])
     surname = models.CharField("Фамилия", max_length=40, validators=[RegexValidator(
         regex=r'^[a-zA-Zа-яА-ЯёЁ -]+$', message="Фамилия может содержать только буквы или дефис", code=None, inverse_match=None, flags=0)])
-    patronymic = models.CharField("Отчество", max_length=40, validators=[RegexValidator(
-        regex=r'^[a-zA-Zа-яА-ЯёЁ -]+$', message="Отчество может содержать только буквы или дефис", code=None, inverse_match=None, flags=0)], null=True, blank=True)
+    patronymic = models.CharField(
+        "Отчество",
+        max_length=40,
+        validators=[
+            RegexValidator(
+                regex="^[a-zA-Zа-яА-ЯёЁ -]+$",
+                message="Отчество может содержать только буквы или дефис",
+                code=None,
+                inverse_match=None,
+                flags=0,
+            )
+        ],
+        default="",
+        blank=True,
+    )
     fullNameInGenetive = models.CharField(
         "Родительный падеж ФИО", max_length=120, validators=[RegexValidator(regex=r'^[a-zA-Zа-яА-ЯёЁ -]+$', message="ФИО должно содержать только буквы", code=None, inverse_match=None, flags=0)])
     birthday = models.DateField("Дата рождения", validators=[MaxValueValidator(
