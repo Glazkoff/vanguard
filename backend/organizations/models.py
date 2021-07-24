@@ -19,7 +19,9 @@ class City(models.Model):
 class Organization(models.Model):
     """Организация"""
     organizationName = models.CharField("Название организации", max_length=150)
-    postCodeOrganization = models.CharField("Индекс организации", null=True, blank=True,max_length=150)
+    postCodeOrganization = models.CharField(
+        "Индекс организации", default="", blank=True, max_length=150
+    )
     legalOrganizationAddress = models.TextField(
         "Юридический адрес организации")
     city = models.ForeignKey(
