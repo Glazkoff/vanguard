@@ -32,7 +32,7 @@ class EmployeeAdmin(ImportExportModelAdmin):
             'fields': ('registrationValidityPeriod', 'registrationAddress')
         }),
         ('Данные из УФМС', {
-            'fields': ('dateOfNotificationUFMSadmission', 'dateOfNotificationUFMSdischarge')
+            'fields': ('nameMIA','dateOfNotificationUFMSadmission', 'dateOfNotificationUFMSdischarge')
         }),
     )
     resource_class = EmployeeResource

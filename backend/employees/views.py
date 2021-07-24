@@ -261,6 +261,7 @@ def mia_notifications_admission(request, employee_in_org_id):
     else:
         contract_date = employeeInOrg.employmentContractDate
 
+    all_address = organization.postCodeOrganization + " " + organization.legalOrganizationAddress 
     # Разделение тексовых данных на элементы
 
     def split_data(data, count_col):
@@ -316,11 +317,11 @@ def mia_notifications_admission(request, employee_in_org_id):
     context = {
         'mia_name_contents': [
             {'cols': split_data_rows(
-                "овм му мвд россии балашихинское", count_col=34, number_row=1)},
+                employee.nameMIA, count_col=34, number_row=1)},
             {'cols': split_data_rows(
-                "овм му мвд россии балашихинское", count_col=34, number_row=2)},
+                employee.nameMIA, count_col=34, number_row=2)},
             {'cols': split_data_rows(
-                "овм му мвд россии балашихинское", count_col=34, number_row=3)},
+                employee.nameMIA, count_col=34, number_row=3)},
         ],
         'surname_contents': [
             {'cols': split_data(employee.surname, 28)}
@@ -358,7 +359,7 @@ def mia_notifications_admission(request, employee_in_org_id):
             {'cols': split_data("паспорт", 19)}
         ],
         'series_identity_document_contents': [
-            {'cols': split_data("1234567", 7)}
+            {'cols': split_data(employee.passportSeries, 7)}
         ],
         'number_identity_document_contents': [
             {'cols': split_data(employee.passportNumber, 9)}
@@ -408,11 +409,11 @@ def mia_notifications_admission(request, employee_in_org_id):
         ],
         'legal_organization_address_contents': [
             {'cols': split_data_rows(
-                organization.legalOrganizationAddress, count_col=34, number_row=1)},
+                all_address, count_col=34, number_row=1)},
             {'cols': split_data_rows(
-                organization.legalOrganizationAddress, count_col=34, number_row=2)},
+                all_address, count_col=34, number_row=2)},
             {'cols': split_data_rows(
-                organization.legalOrganizationAddress, count_col=34, number_row=3)},
+                all_address, count_col=34, number_row=3)},
         ],
         'name_profession_contents': [
             {'cols': split_data_rows(
