@@ -43,6 +43,6 @@ def go_through_patents():
 
 def context_processor(request):
     extra_context = {}
-    if request.path == '/admin/':
-        extra_context['notifications'] = go_through_patents()
+    # if request.path == '//':
+    extra_context['notifications'] = go_through_patents()
     return extra_context
