@@ -15,6 +15,7 @@ from django.template import defaultfilters
 from number_to_string import get_string_by_number
 from itertools import accumulate
 from organizations.models import Organization
+from patents.models import Patent
 
 APP_ROOT = os.path.abspath(os.path.dirname(__file__))
 
@@ -186,17 +187,17 @@ def mia_notifications_admission(request, employee_in_org_id):
     doc = DocxTemplate(os.path.join(
         APP_ROOT, "docs", "mia_notification_admission.docx"))
     # Получить:
-    # - [%] surname - фамилия
-    # - [%] name - имя
-    # - [%] patronymic - отчество
-    # - [] citizenship - гражданство
-    # - [] birthplace - место рождения
-    # - [] birthday - дата рождения
-    # - [%] identity_document - название документа, удостоверяющий личность (ДУЛ)
-    # - [%] identity_document_series - серия документа (ДУЛ)
-    # - [] identity_document_number - номер документа (ДУЛ)
-    # - [] identity_document_issue_date - дата выдачи документа (ДУЛ)
-    # - [] identity_document_issued_by - кем выдан документ (ДУЛ)
+    # - [X] surname - фамилия
+    # - [X] name - имя
+    # - [X] patronymic - отчество
+    # - [X] citizenship - гражданство
+    # - [X] birthplace - место рождения
+    # - [X] birthday - дата рождения
+    # - [@] identity_document - название документа, удостоверяющий личность (ДУЛ)
+    # - [X] identity_document_series - серия документа (ДУЛ)
+    # - [X] identity_document_number - номер документа (ДУЛ)
+    # - [X] identity_document_issue_date - дата выдачи документа (ДУЛ)
+    # - [X] identity_document_issued_by - кем выдан документ (ДУЛ)
     # - [] working_document - наименование документа об обосновании на прием (ОП)
     # - [] working_document_series - серия документа (ОП)
     # - [X] working_document_number - номер документа (ОП)
@@ -209,9 +210,9 @@ def mia_notifications_admission(request, employee_in_org_id):
     # - [] legal_organization_address - адрес организации
 
     # - Отсутствуют в БД:
-    # - [] Наименование МВД
+    # - [X] Наименование МВД
     # - [] Документ на трудовую деятельность
-    # - [] Название профессии (возможно, нужно какое-то особое название для уведомлений)
+    # - [X] Название профессии (возможно, нужно какое-то особое название для уведомлений)
 
     # - Таблицы в шаблоне:
     # - [X] mia_name_contents - название МВД (несколько строк,34 символа)
@@ -240,30 +241,65 @@ def mia_notifications_admission(request, employee_in_org_id):
     # - [X] contract_start_year_contents - год заключения документа (ТД или ГПХ)
     # - [X] legal_organization_address_contents - адрес организации (несколько строк,34 символа)
 
+    # Получение данных из моделей
     employeeInOrg = EmployeeInOrganization.objects.get(
         pk=employee_in_org_id)
     employee = Employee.objects.get(pk=employeeInOrg.employee_id)
+    try:
+        patent = Patent.objects.get(pk=employeeInOrg.employee_id)
+    except Patent.DoesNotExist:
+        patent = []
+        
+
     organization = Organization.objects.get(pk=employeeInOrg.organization_id)
-    # full_name_split = employee.fullName.split()
-    # name_split_content = full_name_split[1]
-    # surname_split_content = full_name_split[0]
-    # if len(full_name_split) == 3:
-    #     patronymic_split_content = full_name_split[2]
-    # else:
-    #     patronymic_split_content = ' '
+    
+    # Проверка наличия отчества
     if employee.patronymic is None: 
             local_patronymic = ""
     else:
             local_patronymic = employee.patronymic
+
+    #Проверка наличия ТД или ГПХ
     contract_date = ' '
     if employeeInOrg.employmentContractNumber == None:
         contract_date = employeeInOrg.startDateOfGPHContract
     else:
         contract_date = employeeInOrg.employmentContractDate
-
+    
+    # Получение полного адреса организация (с индексом)
     all_address = organization.postCodeOrganization + " " + organization.legalOrganizationAddress 
-    # Разделение тексовых данных на элементы
 
+    # Получения данных о патенте
+    name_patent_document = ""
+    patent_number = ""
+    patent_series = ""
+    patent_date_start = ""
+    patent_date_end = ""
+    patent_issued_by = ""
+    if employeeInOrg.reasonWorkEmployee == 'P':
+        if patent.patentNumber is None or patent == []:
+            name_patent_document = ""
+            patent_number = ""
+            patent_series = ""
+            patent_date_start = ""
+            patent_date_end = ""
+            patent_issued_by = ""
+        else:
+            name_patent_document = "Патент"
+            patent_number = patent.patentNumber
+            patent_series = patent.patentSeries
+            patent_date_start = patent.dateOfPatentIssue
+            patent_date_end = patent.dateExpirationPatent
+            patent_issued_by = patent.patentIssuedBy
+
+    # Проверка работает ли сотрудник по ЕАЭС
+    eaeu_document = ""
+    if employeeInOrg.reasonWorkEmployee == 'EAEU':
+        eaeu_document = "Договор ЕАЭС от 29.04.2014"
+    else:
+        eaeu_document = ""
+    
+    # Разделение тексовых данных на элементы
     def split_data(data, count_col):
         data_up = data.upper()
         data_split = list(data_up)
@@ -274,21 +310,33 @@ def mia_notifications_admission(request, employee_in_org_id):
 
     # Получения дня из даты
     def split_day(date):
-        date_split = date.split(".")
-        day = list(date_split[0])
-        return day
+        if date =="" or date is None:
+            day = [" "," "]
+            return day
+        else:
+            date_split = date.split(".")
+            day = list(date_split[0])
+            return day
 
     # Получения месяца из даты
     def split_month(date):
-        date_split = date.split(".")
-        month = list(date_split[1])
-        return month
+        if date =="" or date is None:
+            month = [" "," "]
+            return month
+        else:
+            date_split = date.split(".")
+            month = list(date_split[1])
+            return month
 
     # Получения года из даты
     def split_year(date):
-        date_split = date.split(".")
-        year = list(date_split[2])
-        return year
+        if date =="" or date is None:
+            year = [" "," "," "," "]
+            return year
+        else:
+            date_split = date.split(".")
+            year = list(date_split[2])
+            return year
 
     # Разделение данных на несколько строк
     def split_data_rows(data, count_col, number_row):
@@ -386,12 +434,57 @@ def mia_notifications_admission(request, employee_in_org_id):
         ],
         'name_labor_activity_document_contents': [
             {'cols': split_data_rows(
-                "Договор ЕАЭС от 29.04.2014", count_col=34, number_row=1)},
+                eaeu_document, count_col=34, number_row=1)},
             {'cols': split_data_rows(
-                "Договор ЕАЭС от 29.04.2014", count_col=34, number_row=2)},
+                eaeu_document, count_col=34, number_row=2)},
             {'cols': split_data_rows(
-                "Договор ЕАЭС от 29.04.2014", count_col=34, number_row=3)},
+                eaeu_document, count_col=34, number_row=3)},
         ],
+
+        'name_patent_document_contents': [
+            {'cols': split_data(name_patent_document, 21)}
+        ],
+        'patent_number_contents': [
+            {'cols': split_data(patent_number, 10)}
+        ],
+        'patent_series_contents': [
+            {'cols': split_data(patent_series, 7)}
+        ],
+        'patent_start_day_contents': [
+            {'cols': split_day(defaultfilters.date(
+                patent_date_start, 'd.m.Y'))}
+        ],
+        'patent_start_mouth_contents': [
+            {'cols': split_month(defaultfilters.date(
+                patent_date_start, 'd.m.Y'))}
+        ],
+        'patent_start_year_contents': [
+            {'cols': split_year(defaultfilters.date(
+                patent_date_start, 'd.m.Y'))}
+        ],
+        'patent_end_day_contents': [
+            {'cols': split_day(defaultfilters.date(
+                patent_date_end, 'd.m.Y'))}
+        ],
+        'patent_end_mouth_contents': [
+            {'cols': split_month(defaultfilters.date(
+                patent_date_end, 'd.m.Y'))}
+        ],
+        'patent_end_year_contents': [
+            {'cols': split_year(defaultfilters.date(
+                patent_date_end, 'd.m.Y'))}
+        ],
+         'patent_issued_by_contents': [
+            {'cols': split_data_rows(
+                patent_issued_by, count_col=27, number_row=1)},
+            {'cols': split_data_rows(
+                patent_issued_by, count_col=27, number_row=2)},
+            {'cols': split_data_rows(
+                patent_issued_by, count_col=27, number_row=3)},
+        ],
+
+
+
         'contract_number_contents': [
             {'cols': contract_check(employeeInOrg.employmentContractNumber)}
         ],
