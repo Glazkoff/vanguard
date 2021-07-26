@@ -3,6 +3,7 @@ from .models import Employee
 from datetime import date, timedelta
 from django.utils.html import format_html
 from django.template import defaultfilters
+from datetime import datetime
 
 
 def go_through_patents():
@@ -29,13 +30,13 @@ def go_through_patents():
         formatEndDateOfResidencePermit = defaultfilters.date(
             employee.endDateOfResidencePermit, 'd E Y г.')     
         d = date.today()+timedelta(days=14)
-        if formatRegistrationValidityPeriod<=d:
+        if employee.registrationValidityPeriod <= d:
             notifications.append('Регистрация сотрудника <a href="/admin/employees/employee/'+str(employee.id)+'/change/">'+
             employee.fullNameInGenetive+'</a> действует только до'+ formatRegistrationValidityPeriod + "!")
-        if formatEndDateOfRVP<=d:
+        if employee.endDateOfRVP <= d:
             notifications.append('РВП сотрудника <a href="/admin/employees/employee/'+str(employee.id)+'/change/">'+
             employee.fullNameInGenetive+'</a> действует только до'+ formatEndDateOfRVP + "!")
-        if formatEndDateOfResidencePermit<=d:
+        if employee.endDateOfResidencePermit<=d:
             notifications.append('Вид на жительство сотрудника <a href="/admin/employees/employee/'+str(employee.id)+'/change/">'+
             employee.fullNameInGenetive+'</a> действует только до'+ formatEndDateOfResidencePermit + "!")
     return notifications
