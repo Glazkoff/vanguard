@@ -24,7 +24,7 @@ class PatentResource(resources.ModelResource):
 
 class PatentAdmin(ImportExportModelAdmin):
     """Патенты"""
-    search_fields = ('employee__fullName', 'dateOfPatentIssue', 'dateExpirationPatent',
+    search_fields = ('employee__name', 'employee__surname', 'employee__patronymic', 'dateOfPatentIssue', 'dateExpirationPatent',
                      'patentpaymentreceipt__paymentTermUntil')
     inlines = [PatentPaymentReceiptInline]
     # Поиск по дате выдачи патента и даты оплаты "до" пока осуществляется в формате YYYY-MM-dd

@@ -9,13 +9,35 @@ from django.utils.translation import gettext_lazy as _
 
 class Employee(models.Model):
     """Работники"""
-    fullName = models.CharField("ФИО", max_length=120, validators=[RegexValidator(
-        regex=r'^[a-zA-Zа-яА-ЯёЁ -]+$', message="ФИО должно содержать только буквы", code=None, inverse_match=None, flags=0)])
+    # fullName = models.CharField("ФИО", max_length=120, validators=[RegexValidator(
+    #     regex=r'^[a-zA-Zа-яА-ЯёЁ -]+$', message="ФИО должно содержать только буквы", code=None, inverse_match=None, flags=0)])
+    name = models.CharField("Имя", max_length=30, validators=[RegexValidator(
+        regex=r'^[a-zA-Zа-яА-ЯёЁ -]+$', message="Имя может содержать только буквы или дефис", code=None, inverse_match=None, flags=0)])
+    surname = models.CharField("Фамилия", max_length=40, validators=[RegexValidator(
+        regex=r'^[a-zA-Zа-яА-ЯёЁ -]+$', message="Фамилия может содержать только буквы или дефис", code=None, inverse_match=None, flags=0)])
+    patronymic = models.CharField(
+        "Отчество",
+        max_length=40,
+        validators=[
+            RegexValidator(
+                regex="^[a-zA-Zа-яА-ЯёЁ -]+$",
+                message="Отчество может содержать только буквы или дефис",
+                code=None,
+                inverse_match=None,
+                flags=0,
+            )
+        ],
+        default="",
+        blank=True,
+    )
     fullNameInGenetive = models.CharField(
         "Родительный падеж ФИО", max_length=120, validators=[RegexValidator(regex=r'^[a-zA-Zа-яА-ЯёЁ -]+$', message="ФИО должно содержать только буквы", code=None, inverse_match=None, flags=0)])
     birthday = models.DateField("Дата рождения", validators=[MaxValueValidator(
         limit_value=date.today, message="Дата рождения не может превышать сегодняшнюю")])
     birthplace = models.CharField("Место рождения", max_length=120)
+    passportSeries = models.CharField(
+        "Серия паспорта", max_length=40, default="", blank=True
+    )
     passportNumber = models.CharField("Номер паспорта", max_length=40)
     passportIssuedBy = models.TextField(
         "Кем выдан паспорт", null=True, blank=True)
@@ -49,7 +71,13 @@ class Employee(models.Model):
     updatedAt = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.fullName
+        if self.patronymic is None: 
+            local_patronymic = ""
+        else:
+            local_patronymic = self.patronymic
+        return f"{self.surname} {self.name} {local_patronymic}"
+        
+
 
     class Meta:
         verbose_name = "Работник"
@@ -59,7 +87,11 @@ class Employee(models.Model):
     #     if self.dateOfNotificationUFMSadmission > self.dateOfNotificationUFMSdischarge:
     #         raise ValidationError("Дата уведомления о приеме превышает даты при увольнении")
 
-
+REASON_WORK_SELECTION = [
+    ('P', 'Патент'),
+    ('EAEU', 'ЕАЭС'),
+    ('S', 'Обучение в России'),
+]
 class EmployeeInOrganization(models.Model):
     """Сотрудник в организации"""
     employee = models.ForeignKey(
@@ -87,6 +119,8 @@ class EmployeeInOrganization(models.Model):
         "Дата начала действия ГПХ Договора", null=True, blank=True)
     endDateOfGPHContract = models.DateField(
         "Дата окончания действия ГПХ Договора", null=True, blank=True)
+    reasonWorkEmployee = models.CharField(
+        verbose_name="Основание работы сотрудника", max_length=120, choices=REASON_WORK_SELECTION)
 
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
