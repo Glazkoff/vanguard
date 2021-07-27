@@ -100,8 +100,6 @@ def labor_contract(request, employee_in_org_id):
         # else:
         #     employee_work_place += "зал"
         context = {
-            'contract_number': employeeInOrg.employmentContractNumber,
-            'today': defaultfilters.date(datetime.datetime.today(), '«d» E Y г.'),
             'employee_citizenship': employee.citizenship,
             'employee_full_name': employee.fullName,
             'employee_work_place': employeeInOrg.organization.legalOrganizationAddress,
