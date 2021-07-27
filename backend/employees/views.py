@@ -15,6 +15,8 @@ from django.template import defaultfilters
 from number_to_string import get_string_by_number
 from itertools import accumulate
 from organizations.models import Organization
+from patents.models import Patent
+import datetime
 
 APP_ROOT = os.path.abspath(os.path.dirname(__file__))
 
@@ -94,6 +96,15 @@ def labor_contract(request, employee_in_org_id):
         employeeInOrg = EmployeeInOrganization.objects.get(
             pk=employee_in_org_id)
         employee = Employee.objects.get(pk=employeeInOrg.employee.id)
+        try:
+            patent = Patent.objects.get(pk=employeeInOrg.employee_id)
+        except Patent.DoesNotExist:
+            patent = []
+        employee_reason_work = ""
+        if employeeInOrg.reasonWorkEmployee == 'EAEU':
+            employee_reason_work = "на основании договора ЕАЭС от 29.04.2014"
+        if employeeInOrg.reasonWorkEmployee == 'P':
+            employee_reason_work = "на основании патента № "+patent.patentNumber+" серии "+patent.patentSeries+", который выдан "+ patent.patentIssuedBy+" сроком от "+defaultfilters.date(patent.dateOfPatentIssue, '«d» E Y г.')+" до "+defaultfilters.date(patent.dateExpirationPatent, 'd E Y г.')+" ."
         employee_work_place = ""
         # if employeeInOrg.tariff.kitchenOrHall == "kitchen":
         #     employee_work_place += "кухня"
@@ -101,16 +112,18 @@ def labor_contract(request, employee_in_org_id):
         #     employee_work_place += "зал"
         
         context = {
-            'employee_citizenship': employee.citizenship,
+            'employee_citizenship':  (f"{employee.citizenship}", "")[employee.citizenship is None],
+            'employee_reason_work':employee_reason_work,
             'employee_full_name': (f"{employee.surname} {employee.name} {employee.patronymic}", f"{employee.surname} {employee.name}")[employee.patronymic is None],
-            'employee_work_place': employeeInOrg.organization.legalOrganizationAddress,
-            'work_start_date': defaultfilters.date(employeeInOrg.admissionDate, '«d» E Y г.'),
-            'tariff': employeeInOrg.tariff.salaryPerHour,
-            'tariff_by_words': get_string_by_number(employeeInOrg.tariff.salaryPerHour),
-            'employee_passport_number': employee.passportNumber,
-            'employee_passport_date_of_issue': defaultfilters.date(employee.passportIssueDate, 'd E Y г.'),
-            'employee_snils': employee.SNILS,
-            'employee_inn': employee.INN
+            'employee_work_place': (f"{employeeInOrg.organization.legalOrganizationAddress}", "")[employeeInOrg.organization.legalOrganizationAddress is None],
+            'work_start_date': (defaultfilters.date(employeeInOrg.admissionDate, '«d» E Y г.'), "")[employeeInOrg.admissionDate is None],
+            'tariff': (f"{employeeInOrg.tariff.salaryPerHour}", "")[employeeInOrg.tariff.salaryPerHour is None],
+            'tariff_by_words': get_string_by_number((f"{employeeInOrg.tariff.salaryPerHour}", "")[employeeInOrg.tariff.salaryPerHour is None]),
+            'employee_passport_number':(f"{employee.passportNumber}", "—")[employee.passportNumber is None],
+            'employee_passport_series':(f"{employee.passportSeries}", "—")[employee.passportSeries is None or employee.passportSeries == ""],
+            'employee_passport_date_of_issue': (defaultfilters.date(employee.passportIssueDate, 'd E Y г.'), "")[employee.passportIssueDate is None],
+            'employee_snils': (f"{employee.SNILS}", "—")[employee.SNILS is None],
+            'employee_inn': (f"{employee.INN}", "—")[employee.INN is None]
         }
     except EmployeeInOrganization.DoesNotExist:
         html = "<html><body><h1 style='font-family: sans-serif;'>Работник в организации не найден!</h1></body></html>"
