@@ -36,9 +36,9 @@ class Employee(models.Model):
         limit_value=date.today, message="Дата рождения не может превышать сегодняшнюю")])
     birthplace = models.CharField("Место рождения", max_length=120)
     passportSeries = models.CharField(
-        "Серия паспорта", max_length=40, default="", blank=True
+        "Серия паспорта", max_length=10, default="", blank=True
     )
-    passportNumber = models.CharField("Номер паспорта", max_length=40)
+    passportNumber = models.CharField("Номер паспорта", max_length=10)
     passportIssuedBy = models.TextField(
         "Кем выдан паспорт", null=True, blank=True)
     passportIssueDate = models.DateField("Дата выдачи паспорта")
@@ -59,6 +59,9 @@ class Employee(models.Model):
         "Дата уведомления УФМС при приёме", null=True, blank=True)
     dateOfNotificationUFMSdischarge = models.DateField(
         "Дата уведомления УФМС при увольнении", null=True, blank=True)
+    nameMIA = models.CharField(
+        "Название МВД", max_length=240, blank=True
+    )
     bankDetailsCardNumber = models.CharField(
         "Номер банковской карты", max_length=16, default="", blank=True
     )

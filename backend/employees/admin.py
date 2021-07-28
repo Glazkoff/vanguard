@@ -32,7 +32,7 @@ class EmployeeAdmin(ImportExportModelAdmin):
             'fields': ('registrationValidityPeriod', 'registrationAddress')
         }),
         ('Данные из УФМС', {
-            'fields': ('dateOfNotificationUFMSadmission', 'dateOfNotificationUFMSdischarge')
+            'fields': ('nameMIA','dateOfNotificationUFMSadmission', 'dateOfNotificationUFMSdischarge')
         }),
     )
     resource_class = EmployeeResource
@@ -62,8 +62,11 @@ class EmployeeAdmin(ImportExportModelAdmin):
             employee=obj)
         for empInOrg in employeeInOrganizations:
             tag_string += f'<a target="_blank" style="margin-bottom: 1rem;" href="/api/documents/labor_contract/{empInOrg.id}">Сформировать трудовой договор ({empInOrg.tariff.positionName})</a>'
-            tag_string += f'<br /><a target="_blank" style="margin-bottom: 1rem;" href="/api/documents/mia_notifications_admission/{empInOrg.id}">Сформировать уведомление в МВД о приеме</a>'
             tag_string += f'<br /><a target="_blank" style="margin-bottom: 1rem;" href="/api/documents/gph_contract/{empInOrg.id}">Сформировать договор ГПХ</a>'
+            if empInOrg.employmentContractDate is not None or empInOrg.startDateOfGPHContract is not None:
+                tag_string += f'<br /><a target="_blank" style="margin-bottom: 1rem;" href="/api/documents/mia_notifications_admission/{empInOrg.id}">Сформировать уведомление в МВД о приеме</a>'
+            if empInOrg.dischargeDate is not None:
+                tag_string += f'<br /><a target="_blank" style="margin-bottom: 1rem;" href="/api/documents/mia_notification_discharge/{empInOrg.id}">Сформировать уведомление в МВД об увольнении</a>'
         return format_html(tag_string)
 
     action_set.short_description = "Действия"
