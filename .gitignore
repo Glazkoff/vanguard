@@ -77,3 +77,5 @@ media/
 # Venv
 venv
 .env
+
+/frontend/package-lock.json
