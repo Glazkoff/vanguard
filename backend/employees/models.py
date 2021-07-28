@@ -93,7 +93,7 @@ class Employee(models.Model):
 REASON_WORK_SELECTION = [
     ('P', 'Патент'),
     ('EAEU', 'ЕАЭС'),
-    ('S', 'Обучение в России'),
+    ('S', 'Другое'),
 ]
 class EmployeeInOrganization(models.Model):
     """Сотрудник в организации"""
