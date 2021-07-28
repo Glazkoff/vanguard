@@ -104,7 +104,7 @@ def labor_contract(request, employee_in_org_id):
         if employeeInOrg.reasonWorkEmployee == 'EAEU':
             employee_reason_work = "на основании договора ЕАЭС от 29.04.2014"
         if employeeInOrg.reasonWorkEmployee == 'P':
-            employee_reason_work = "на основании патента № "+patent.patentNumber+" серии "+patent.patentSeries+", который выдан "+ patent.patentIssuedBy+" сроком от "+defaultfilters.date(patent.dateOfPatentIssue, '«d» E Y г.')+" до "+defaultfilters.date(patent.dateExpirationPatent, 'd E Y г.')+" ."
+            employee_reason_work = "на основании патента № "+patent.patentNumber+" серии "+patent.patentSeries+", который выдан "+ patent.patentIssuedBy+" сроком от "+defaultfilters.date(patent.dateOfPatentIssue, 'd E Y г.')+" до "+defaultfilters.date(patent.dateExpirationPatent, 'd E Y г.')+" ."
         employee_work_place = ""
         # if employeeInOrg.tariff.kitchenOrHall == "kitchen":
         #     employee_work_place += "кухня"
