@@ -101,23 +101,27 @@ def labor_contract(request, employee_in_org_id):
         if employeeInOrg.reasonWorkEmployee == 'EAEU':
             employee_reason_work = "на основании договора ЕАЭС от 29.04.2014"
         if employeeInOrg.reasonWorkEmployee == 'P':
-            employee_reason_work = "на основании патента № "+patent.patentNumber+" серии "+patent.patentSeries+", который выдан "+ patent.patentIssuedBy+" сроком от "+defaultfilters.date(patent.dateOfPatentIssue, 'd E Y г.')+" до "+defaultfilters.date(patent.dateExpirationPatent, 'd E Y г.')+" ."
+            employee_reason_work = "на основании патента № "+patent.patentNumber+" серии "+patent.patentSeries+", который выдан " + patent.patentIssuedBy + \
+                " сроком от "+defaultfilters.date(patent.dateOfPatentIssue, 'd E Y г.') + \
+                " до " + \
+                defaultfilters.date(
+                    patent.dateExpirationPatent, 'd E Y г.')+" ."
         employee_work_place = ""
         # if employeeInOrg.tariff.kitchenOrHall == "kitchen":
         #     employee_work_place += "кухня"
         # else:
         #     employee_work_place += "зал"
-        
+
         context = {
             'employee_citizenship':  (f"{employee.citizenship}", "")[employee.citizenship is None],
-            'employee_reason_work':employee_reason_work,
+            'employee_reason_work': employee_reason_work,
             'employee_full_name': (f"{employee.surname} {employee.name} {employee.patronymic}", f"{employee.surname} {employee.name}")[employee.patronymic is None],
             'employee_work_place': (f"{employeeInOrg.organization.legalOrganizationAddress}", "")[employeeInOrg.organization.legalOrganizationAddress is None],
             'work_start_date': (defaultfilters.date(employeeInOrg.admissionDate, '«d» E Y г.'), "")[employeeInOrg.admissionDate is None],
             'tariff': (f"{employeeInOrg.tariff.salaryPerHour}", "")[employeeInOrg.tariff.salaryPerHour is None],
             'tariff_by_words': get_string_by_number((f"{employeeInOrg.tariff.salaryPerHour}", "")[employeeInOrg.tariff.salaryPerHour is None]),
-            'employee_passport_number':(f"{employee.passportNumber}", "—")[employee.passportNumber is None],
-            'employee_passport_series':(f"{employee.passportSeries}", "—")[employee.passportSeries is None or employee.passportSeries == ""],
+            'employee_passport_number': (f"{employee.passportNumber}", "—")[employee.passportNumber is None],
+            'employee_passport_series': (f"{employee.passportSeries}", "—")[employee.passportSeries is None or employee.passportSeries == ""],
             'employee_passport_date_of_issue': (defaultfilters.date(employee.passportIssueDate, 'd E Y г.'), "")[employee.passportIssueDate is None],
             'employee_snils': (f"{employee.SNILS}", "—")[employee.SNILS is None],
             'employee_inn': (f"{employee.INN}", "—")[employee.INN is None]
@@ -155,16 +159,16 @@ def gph_contract(request, employee_in_org_id):
             'today': defaultfilters.date(datetime.datetime.today(), '«d» E Y г.'),
             'employee_work_place': (f"{employeeInOrg.organization.legalOrganizationAddress}", "")[employeeInOrg.organization.legalOrganizationAddress is None],
             'end_date_gph_contract': (defaultfilters.date(employeeInOrg.endDateOfGPHContract, 'd E Y г.'), "")[employeeInOrg.endDateOfGPHContract is None],
-            'employee_passport_series':  (f"серия {employee.passportSeries}  № ", "")[employee.passportSeries is None], 
+            'employee_passport_series':  (f"серия {employee.passportSeries}  № ", "")[employee.passportSeries is None],
             'employee_passport_number': (f"{employee.passportNumber}", "")[employee.passportNumber is None],
             'employee_passport_issued_by': (f"{employee.passportIssuedBy}", "")[employee.passportIssuedBy is None],
             'employee_passport_date_of_issue': (defaultfilters.date(employee.passportIssueDate, 'd E Y г.'), "")[employee.passportIssueDate is None],
             'employee_registration_address': (f"{employee.registrationAddress}", "")[employee.registrationAddress is None],
             'employee_inn': (f"{employee.INN}", "")[employee.INN is None],
-            'employee_phone': (f"{employee.phoneNumber}", "")[employee.phoneNumber is None], 
+            'employee_phone': (f"{employee.phoneNumber}", "")[employee.phoneNumber is None],
             'tariff': (f"{employeeInOrg.tariff.salaryPerHour}", "")[employeeInOrg.tariff.salaryPerHour is None],
             'tariff_by_words': (get_string_by_number(employeeInOrg.tariff.salaryPerHour), "")[employeeInOrg.tariff.salaryPerHour is None],
-            
+
         }
     except EmployeeInOrganization.DoesNotExist:
         html = "<html><body><h1 style='font-family: sans-serif;'>Работник в организации не найден!</h1></body></html>"
@@ -187,7 +191,9 @@ def gph_contract(request, employee_in_org_id):
 
     return response
 
-# Уведомление МВД о приеме 
+# Уведомление МВД о приеме
+
+
 @login_required(login_url='/admin')
 def mia_notifications_admission(request, employee_in_org_id):
     # os.path.dirname(employees.__file__)
@@ -256,25 +262,25 @@ def mia_notifications_admission(request, employee_in_org_id):
         patent = Patent.objects.get(pk=employeeInOrg.employee_id)
     except Patent.DoesNotExist:
         patent = []
-        
 
     organization = Organization.objects.get(pk=employeeInOrg.organization_id)
-    
-    # Проверка наличия отчества
-    if employee.patronymic is None: 
-            local_patronymic = ""
-    else:
-            local_patronymic = employee.patronymic
 
-    #Проверка наличия ТД или ГПХ
+    # Проверка наличия отчества
+    if employee.patronymic is None:
+        local_patronymic = ""
+    else:
+        local_patronymic = employee.patronymic
+
+    # Проверка наличия ТД или ГПХ
     contract_date = ' '
     if employeeInOrg.employmentContractNumber == None:
         contract_date = employeeInOrg.startDateOfGPHContract
     else:
         contract_date = employeeInOrg.employmentContractDate
-    
+
     # Получение полного адреса организация (с индексом)
-    all_address = organization.postCodeOrganization + " " + organization.legalOrganizationAddress 
+    all_address = organization.postCodeOrganization + \
+        " " + organization.legalOrganizationAddress
 
     # Получения данных о патенте
     name_patent_document = ""
@@ -305,7 +311,7 @@ def mia_notifications_admission(request, employee_in_org_id):
         eaeu_document = "Договор ЕАЭС от 29.04.2014"
     else:
         eaeu_document = ""
-    
+
     # Разделение тексовых данных на элементы
     def split_data(data, count_col):
         data_up = data.upper()
@@ -317,8 +323,8 @@ def mia_notifications_admission(request, employee_in_org_id):
 
     # Получения дня из даты
     def split_day(date):
-        if date =="" or date is None:
-            day = [" "," "]
+        if date == "" or date is None:
+            day = [" ", " "]
             return day
         else:
             date_split = date.split(".")
@@ -328,7 +334,7 @@ def mia_notifications_admission(request, employee_in_org_id):
     # Получения месяца из даты
     def split_month(date):
         if date == "" or date is None:
-            month = [" "," "]
+            month = [" ", " "]
             return month
         else:
             date_split = date.split(".")
@@ -337,8 +343,8 @@ def mia_notifications_admission(request, employee_in_org_id):
 
     # Получения года из даты
     def split_year(date):
-        if date =="" or date is None:
-            year = [" "," "," "," "]
+        if date == "" or date is None:
+            year = [" ", " ", " ", " "]
             return year
         else:
             date_split = date.split(".")
@@ -351,6 +357,20 @@ def mia_notifications_admission(request, employee_in_org_id):
         data_split = list(data_up)
         count_data_split = len(data_split)
         length_to_split = [count_col, count_col, count_col]
+        output_data = [data_split[x - y: x]
+                       for x, y in zip(accumulate(length_to_split), length_to_split)]
+        for i in range(len(output_data)):
+            if (len(output_data[i]) < count_col):
+                for k in range(count_col-len(output_data[i])):
+                    output_data[i].append('   ')
+        return output_data[number_row-1]
+
+    # Разделение данных на несколько строк с заданным отступом
+    def split_data_rows_with_prev(data, prev, count_col, number_row):
+        data_up = data.upper()
+        data_split = list(data_up)
+        count_data_split = len(data_split)
+        length_to_split = [prev, count_col, count_col]
         output_data = [data_split[x - y: x]
                        for x, y in zip(accumulate(length_to_split), length_to_split)]
         for i in range(len(output_data)):
@@ -393,23 +413,37 @@ def mia_notifications_admission(request, employee_in_org_id):
         'birthplace_contents': [
             {'cols': split_data_rows(
                 employee.birthplace, count_col=24, number_row=1)},
-            {'cols': split_data_rows(
-                employee.birthplace, count_col=24, number_row=2)},
-            {'cols': split_data_rows(
-                employee.birthplace, count_col=24, number_row=3)},
+            # {'cols': split_data_rows(
+            #     employee.birthplace, count_col=24, number_row=2)},
+            # {'cols': split_data_rows(
+            #     employee.birthplace, count_col=24, number_row=3)},
         ],
-        'birth_day_contents': [
+        'birthplace2_contents': [
+            # {'cols': split_data_rows(
+            #     employee.birthplace, count_col=24, number_row=1)},
+            {'cols': split_data_rows_with_prev(
+                employee.birthplace, prev=24, count_col=34, number_row=2)},
+            # {'cols': split_data_rows(
+            #     employee.birthplace, count_col=24, number_row=3)},
+        ],
+        'birthday_contents': [
             {'cols': split_day(defaultfilters.date(
-                employee.birthday, 'd.m.Y'))}
+                employee.birthday, 'd.m.Y')) + [" ", ] + split_month(defaultfilters.date(
+                    employee.birthday, 'd.m.Y')) + [" ", ] + split_year(defaultfilters.date(
+                        employee.birthday, 'd.m.Y'))}
         ],
-        'birth_mouth_contents': [
-            {'cols': split_month(defaultfilters.date(
-                employee.birthday, 'd.m.Y'))}
-        ],
-        'birth_year_contents': [
-            {'cols': split_year(defaultfilters.date(
-                employee.birthday, 'd.m.Y'))}
-        ],
+        # 'birth_day_contents': [
+        #     {'cols': split_day(defaultfilters.date(
+        #         employee.birthday, 'd.m.Y'))}
+        # ],
+        # 'birth_month_contents': [
+        #     {'cols': split_month(defaultfilters.date(
+        #         employee.birthday, 'd.m.Y'))}
+        # ],
+        # 'birth_year_contents': [
+        #     {'cols': split_year(defaultfilters.date(
+        #         employee.birthday, 'd.m.Y'))}
+        # ],
         'type_identity_document_contents': [
             {'cols': split_data("паспорт", 19)}
         ],
@@ -419,25 +453,33 @@ def mia_notifications_admission(request, employee_in_org_id):
         'number_identity_document_contents': [
             {'cols': split_data(employee.passportNumber, 9)}
         ],
-        'identity_document_day_contents': [
+        'identity_document_date_contents': [
             {'cols': split_day(defaultfilters.date(
-                employee.passportIssueDate, 'd.m.Y'))}
+                employee.passportIssueDate, 'd.m.Y')) + [" ", ] + split_month(defaultfilters.date(employee.passportIssueDate, 'd.m.Y')) + [" ", ] + split_year(defaultfilters.date(employee.passportIssueDate, 'd.m.Y'))}
         ],
-        'identity_document_month_contents': [
-            {'cols': split_month(defaultfilters.date(
-                employee.passportIssueDate, 'd.m.Y'))}
-        ],
-        'identity_document_year_contents': [
-            {'cols': split_year(defaultfilters.date(
-                employee.passportIssueDate, 'd.m.Y'))}
-        ],
+        # 'identity_document_day_contents': [
+        #     {'cols': split_day(defaultfilters.date(
+        #         employee.passportIssueDate, 'd.m.Y'))}
+        # ],
+        # 'identity_document_month_contents': [
+        #     {'cols': split_month(defaultfilters.date(
+        #         employee.passportIssueDate, 'd.m.Y'))}
+        # ],
+        # 'identity_document_year_contents': [
+        #     {'cols': split_year(defaultfilters.date(
+        #         employee.passportIssueDate, 'd.m.Y'))}
+        # ],
         'identity_document_issued_by_contents': [
             {'cols': split_data_rows(
                 employee.passportIssuedBy, count_col=28, number_row=1)},
-            {'cols': split_data_rows(
-                employee.passportIssuedBy, count_col=28, number_row=2)},
-            {'cols': split_data_rows(
-                employee.passportIssuedBy, count_col=28, number_row=3)},
+        ],
+        'identity_document_issued_by2_contents': [
+            {'cols': split_data_rows_with_prev(
+                employee.passportIssuedBy, prev=28, count_col=28, number_row=2)},
+        ],
+        'identity_document_issued_by3_contents': [
+            {'cols': split_data_rows_with_prev(
+                employee.passportIssuedBy, prev=56, count_col=13, number_row=2)},
         ],
         'name_labor_activity_document_contents': [
             {'cols': split_data_rows(
@@ -457,18 +499,10 @@ def mia_notifications_admission(request, employee_in_org_id):
         'patent_series_contents': [
             {'cols': split_data(patent_series, 7)}
         ],
-        'patent_start_day_contents': [
-            {'cols': split_day(defaultfilters.date(
-                patent_date_start, 'd.m.Y'))}
-        ],
-        'patent_start_mouth_contents': [
-            {'cols': split_month(defaultfilters.date(
-                patent_date_start, 'd.m.Y'))}
-        ],
-        'patent_start_year_contents': [
-            {'cols': split_year(defaultfilters.date(
-                patent_date_start, 'd.m.Y'))}
-        ],
+        'patent_start_date_contents': [{'cols': split_day(defaultfilters.date(
+            patent_date_start, 'd.m.Y'))+[" ", ]+split_month(defaultfilters.date(
+                patent_date_start, 'd.m.Y'))+[" ", ]+split_year(defaultfilters.date(
+                    patent_date_start, 'd.m.Y'))}],
         'patent_end_day_contents': [
             {'cols': split_day(defaultfilters.date(
                 patent_date_end, 'd.m.Y'))}
@@ -481,17 +515,14 @@ def mia_notifications_admission(request, employee_in_org_id):
             {'cols': split_year(defaultfilters.date(
                 patent_date_end, 'd.m.Y'))}
         ],
-         'patent_issued_by_contents': [
+        'patent_issued_by_contents': [
             {'cols': split_data_rows(
                 patent_issued_by, count_col=27, number_row=1)},
-            {'cols': split_data_rows(
-                patent_issued_by, count_col=27, number_row=2)},
-            {'cols': split_data_rows(
-                patent_issued_by, count_col=27, number_row=3)},
         ],
-
-
-
+        'patent_issued_by2_contents': [
+            {'cols': split_data_rows_with_prev(
+                patent_issued_by, prev=27, count_col=34, number_row=2)},
+        ],
         'contract_number_contents': [
             {'cols': contract_check(employeeInOrg.employmentContractNumber)}
         ],
@@ -541,12 +572,14 @@ def mia_notifications_admission(request, employee_in_org_id):
     return response
 
 # Уведомление МВД об увольнени
+
+
 @login_required(login_url='/admin')
 def mia_notification_discharge(request, employee_in_org_id):
     # os.path.dirname(employees.__file__)
     doc = DocxTemplate(os.path.join(
         APP_ROOT, "docs", "mia_notification_discharge.docx"))
-    
+
     # Получение данных из моделей
     employeeInOrg = EmployeeInOrganization.objects.get(
         pk=employee_in_org_id)
@@ -555,15 +588,14 @@ def mia_notification_discharge(request, employee_in_org_id):
         patent = Patent.objects.get(pk=employeeInOrg.employee_id)
     except Patent.DoesNotExist:
         patent = []
-        
 
     organization = Organization.objects.get(pk=employeeInOrg.organization_id)
-    
+
     # Проверка наличия отчества
-    if employee.patronymic is None: 
-            local_patronymic = ""
+    if employee.patronymic is None:
+        local_patronymic = ""
     else:
-            local_patronymic = employee.patronymic
+        local_patronymic = employee.patronymic
 
     # Получения данных о патенте
     name_patent_document = ""
@@ -594,7 +626,7 @@ def mia_notification_discharge(request, employee_in_org_id):
         eaeu_document = "Договор ЕАЭС от 29.04.2014"
     else:
         eaeu_document = ""
-    
+
     # Разделение тексовых данных на элементы
     def split_data(data, count_col):
         data_up = data.upper()
@@ -606,7 +638,7 @@ def mia_notification_discharge(request, employee_in_org_id):
 
     # Получения дня из даты
     def split_day(date):
-        if date =="" or date is None:
+        if date == "" or date is None:
             day = [" ", " "]
             return day
         else:
@@ -616,8 +648,8 @@ def mia_notification_discharge(request, employee_in_org_id):
 
     # Получения месяца из даты
     def split_month(date):
-        if date =="" or date is None:
-            month = [" "," "]
+        if date == "" or date is None:
+            month = [" ", " "]
             return month
         else:
             date_split = date.split(".")
@@ -626,8 +658,8 @@ def mia_notification_discharge(request, employee_in_org_id):
 
     # Получения года из даты
     def split_year(date):
-        if date =="" or date is None:
-            year = [" "," "," "," "]
+        if date == "" or date is None:
+            year = [" ", " ", " ", " "]
             return year
         else:
             date_split = date.split(".")
@@ -736,7 +768,6 @@ def mia_notification_discharge(request, employee_in_org_id):
             {'cols': split_data_rows(
                 eaeu_document, count_col=34, number_row=3)},
         ],
-
         'name_patent_document_contents': [
             {'cols': split_data(name_patent_document, 21)}
         ],
@@ -770,7 +801,7 @@ def mia_notification_discharge(request, employee_in_org_id):
             {'cols': split_year(defaultfilters.date(
                 patent_date_end, 'd.m.Y'))}
         ],
-         'patent_issued_by_contents': [
+        'patent_issued_by_contents': [
             {'cols': split_data_rows(
                 patent_issued_by, count_col=27, number_row=1)},
             {'cols': split_data_rows(
@@ -785,13 +816,16 @@ def mia_notification_discharge(request, employee_in_org_id):
             {'cols': contract_check(employeeInOrg.GPHContractNumber)}
         ],
         'contract_start_day_contents': [
-            {'cols': split_day(defaultfilters.date(employeeInOrg.dischargeDate, 'd.m.Y'))}
+            {'cols': split_day(defaultfilters.date(
+                employeeInOrg.dischargeDate, 'd.m.Y'))}
         ],
         'contract_start_mouth_contents': [
-            {'cols': split_month(defaultfilters.date(employeeInOrg.dischargeDate, 'd.m.Y'))}
+            {'cols': split_month(defaultfilters.date(
+                employeeInOrg.dischargeDate, 'd.m.Y'))}
         ],
         'contract_start_year_contents': [
-            {'cols': split_year(defaultfilters.date(employeeInOrg.dischargeDate, 'd.m.Y'))}
+            {'cols': split_year(defaultfilters.date(
+                employeeInOrg.dischargeDate, 'd.m.Y'))}
         ],
         'name_profession_contents': [
             {'cols': split_data_rows(
