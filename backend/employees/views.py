@@ -386,7 +386,7 @@ def mia_notifications_admission(request, employee_in_org_id):
             mark_contract = " "
             return mark_contract
         if (contract_number != None):
-            mark_contract = "X"
+            mark_contract = "V"
             return mark_contract
 
     context = {
