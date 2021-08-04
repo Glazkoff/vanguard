@@ -30,13 +30,17 @@ def go_through_patents():
         formatEndDateOfResidencePermit = defaultfilters.date(
             employee.endDateOfResidencePermit, 'd E Y г.')
         d = date.today()+timedelta(days=14)
-        if employee.registrationValidityPeriod <= d:
+        if (
+            employee.registrationValidityPeriod is not None
+            and employee.registrationValidityPeriod <= d
+        ):
             notifications.append('Регистрация сотрудника <a href="/admin/employees/employee/'+str(employee.id)+'/change/">' +
                                  employee.fullNameInGenetive+'</a> действует только до ' + formatRegistrationValidityPeriod + "!")
-        if employee.endDateOfRVP <= d:
+        if (employee.endDateOfRVP is not None
+                and employee.endDateOfRVP <= d):
             notifications.append('РВП сотрудника <a href="/admin/employees/employee/'+str(employee.id)+'/change/">' +
                                  employee.fullNameInGenetive+'</a> действует только до ' + formatEndDateOfRVP + "!")
-        if employee.endDateOfResidencePermit <= d:
+        if (employee.endDateOfResidencePermit is not None and employee.endDateOfResidencePermit <= d):
             notifications.append('Вид на жительство сотрудника <a href="/admin/employees/employee/'+str(employee.id)+'/change/">' +
                                  employee.fullNameInGenetive+'</a> действует только до ' + formatEndDateOfResidencePermit + "!")
     return notifications

@@ -365,6 +365,20 @@ def mia_notifications_admission(request, employee_in_org_id):
                     output_data[i].append('   ')
         return output_data[number_row-1]
 
+    # Разделение данных на несколько строк с заданным отступом
+    def split_data_rows_with_prev(data, prev, count_col, number_row):
+        data_up = data.upper()
+        data_split = list(data_up)
+        count_data_split = len(data_split)
+        length_to_split = [prev, count_col, count_col]
+        output_data = [data_split[x - y: x]
+                       for x, y in zip(accumulate(length_to_split), length_to_split)]
+        for i in range(len(output_data)):
+            if (len(output_data[i]) < count_col):
+                for k in range(count_col-len(output_data[i])):
+                    output_data[i].append('   ')
+        return output_data[number_row-1]
+
     # Проверка работает ли сотрудник по ТД или по ГПХ
     def contract_check(contract_number):
         mark_contract = " "
@@ -372,7 +386,7 @@ def mia_notifications_admission(request, employee_in_org_id):
             mark_contract = " "
             return mark_contract
         if (contract_number != None):
-            mark_contract = "X"
+            mark_contract = "V"
             return mark_contract
 
     context = {
@@ -399,22 +413,16 @@ def mia_notifications_admission(request, employee_in_org_id):
         'birthplace_contents': [
             {'cols': split_data_rows(
                 employee.birthplace, count_col=24, number_row=1)},
-            {'cols': split_data_rows(
-                employee.birthplace, count_col=24, number_row=2)},
-            {'cols': split_data_rows(
-                employee.birthplace, count_col=24, number_row=3)},
         ],
-        'birth_day_contents': [
+        'birthplace2_contents': [
+            {'cols': split_data_rows_with_prev(
+                employee.birthplace, prev=24, count_col=34, number_row=2)},
+        ],
+        'birthday_contents': [
             {'cols': split_day(defaultfilters.date(
-                employee.birthday, 'd.m.Y'))}
-        ],
-        'birth_mouth_contents': [
-            {'cols': split_month(defaultfilters.date(
-                employee.birthday, 'd.m.Y'))}
-        ],
-        'birth_year_contents': [
-            {'cols': split_year(defaultfilters.date(
-                employee.birthday, 'd.m.Y'))}
+                employee.birthday, 'd.m.Y')) + [" ", ] + split_month(defaultfilters.date(
+                    employee.birthday, 'd.m.Y')) + [" ", ] + split_year(defaultfilters.date(
+                        employee.birthday, 'd.m.Y'))}
         ],
         'type_identity_document_contents': [
             {'cols': split_data("паспорт", 19)}
@@ -425,25 +433,21 @@ def mia_notifications_admission(request, employee_in_org_id):
         'number_identity_document_contents': [
             {'cols': split_data(employee.passportNumber, 9)}
         ],
-        'identity_document_day_contents': [
+        'identity_document_date_contents': [
             {'cols': split_day(defaultfilters.date(
-                employee.passportIssueDate, 'd.m.Y'))}
-        ],
-        'identity_document_month_contents': [
-            {'cols': split_month(defaultfilters.date(
-                employee.passportIssueDate, 'd.m.Y'))}
-        ],
-        'identity_document_year_contents': [
-            {'cols': split_year(defaultfilters.date(
-                employee.passportIssueDate, 'd.m.Y'))}
+                employee.passportIssueDate, 'd.m.Y')) + [" ", ] + split_month(defaultfilters.date(employee.passportIssueDate, 'd.m.Y')) + [" ", ] + split_year(defaultfilters.date(employee.passportIssueDate, 'd.m.Y'))}
         ],
         'identity_document_issued_by_contents': [
             {'cols': split_data_rows(
                 employee.passportIssuedBy, count_col=28, number_row=1)},
-            {'cols': split_data_rows(
-                employee.passportIssuedBy, count_col=28, number_row=2)},
-            {'cols': split_data_rows(
-                employee.passportIssuedBy, count_col=28, number_row=3)},
+        ],
+        'identity_document_issued_by2_contents': [
+            {'cols': split_data_rows_with_prev(
+                employee.passportIssuedBy, prev=28, count_col=28, number_row=2)},
+        ],
+        'identity_document_issued_by3_contents': [
+            {'cols': split_data_rows_with_prev(
+                employee.passportIssuedBy, prev=56, count_col=13, number_row=2)},
         ],
         'name_labor_activity_document_contents': [
             {'cols': split_data_rows(
@@ -463,56 +467,33 @@ def mia_notifications_admission(request, employee_in_org_id):
         'patent_series_contents': [
             {'cols': split_data(patent_series, 7)}
         ],
-        'patent_start_day_contents': [
-            {'cols': split_day(defaultfilters.date(
-                patent_date_start, 'd.m.Y'))}
-        ],
-        'patent_start_mouth_contents': [
-            {'cols': split_month(defaultfilters.date(
-                patent_date_start, 'd.m.Y'))}
-        ],
-        'patent_start_year_contents': [
-            {'cols': split_year(defaultfilters.date(
-                patent_date_start, 'd.m.Y'))}
-        ],
-        'patent_end_day_contents': [
-            {'cols': split_day(defaultfilters.date(
-                patent_date_end, 'd.m.Y'))}
-        ],
-        'patent_end_mouth_contents': [
-            {'cols': split_month(defaultfilters.date(
-                patent_date_end, 'd.m.Y'))}
-        ],
-        'patent_end_year_contents': [
-            {'cols': split_year(defaultfilters.date(
-                patent_date_end, 'd.m.Y'))}
-        ],
+        'patent_start_date_contents': [{'cols': split_day(defaultfilters.date(
+            patent_date_start, 'd.m.Y'))+[" ", ]+split_month(defaultfilters.date(
+                patent_date_start, 'd.m.Y'))+[" ", ]+split_year(defaultfilters.date(
+                    patent_date_start, 'd.m.Y'))}],
+        'patent_end_date_contents': [{'cols': split_day(defaultfilters.date(
+            patent_date_end, 'd.m.Y'))+[" ", ]+split_month(defaultfilters.date(
+                patent_date_end, 'd.m.Y'))+[" ", ]+split_year(defaultfilters.date(
+                    patent_date_end, 'd.m.Y'))}],
         'patent_issued_by_contents': [
             {'cols': split_data_rows(
                 patent_issued_by, count_col=27, number_row=1)},
-            {'cols': split_data_rows(
-                patent_issued_by, count_col=27, number_row=2)},
-            {'cols': split_data_rows(
-                patent_issued_by, count_col=27, number_row=3)},
         ],
-
-
-
+        'patent_issued_by2_contents': [
+            {'cols': split_data_rows_with_prev(
+                patent_issued_by, prev=27, count_col=34, number_row=2)},
+        ],
         'contract_number_contents': [
             {'cols': contract_check(employeeInOrg.employmentContractNumber)}
         ],
         'contract_gph_number_contents': [
             {'cols': contract_check(employeeInOrg.GPHContractNumber)}
         ],
-        'contract_start_day_contents': [
-            {'cols': split_day(defaultfilters.date(contract_date, 'd.m.Y'))}
-        ],
-        'contract_start_mouth_contents': [
-            {'cols': split_month(defaultfilters.date(contract_date, 'd.m.Y'))}
-        ],
-        'contract_start_year_contents': [
-            {'cols': split_year(defaultfilters.date(contract_date, 'd.m.Y'))}
-        ],
+        'contract_start_date_contents': [{'cols': split_day(defaultfilters.date(
+            contract_date, 'd.m.Y'))+[" ", ]+split_month(defaultfilters.date(
+                contract_date, 'd.m.Y'))+[" ", ]+split_year(defaultfilters.date(
+                    contract_date, 'd.m.Y'))}],
+
         'legal_organization_address_contents': [
             {'cols': split_data_rows(
                 all_address, count_col=34, number_row=1)},
@@ -548,13 +529,19 @@ def mia_notifications_admission(request, employee_in_org_id):
 
 # Уведомление МВД об увольнени
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 08167a0b6e126e1c9d4f470037b2aff1f964fa57
 @login_required(login_url='/admin')
 def mia_notification_discharge(request, employee_in_org_id):
     # os.path.dirname(employees.__file__)
     doc = DocxTemplate(os.path.join(
         APP_ROOT, "docs", "mia_notification_discharge.docx"))
+<<<<<<< HEAD
 
+=======
+>>>>>>> 08167a0b6e126e1c9d4f470037b2aff1f964fa57
     # Получение данных из моделей
     employeeInOrg = EmployeeInOrganization.objects.get(
         pk=employee_in_org_id)
@@ -571,6 +558,17 @@ def mia_notification_discharge(request, employee_in_org_id):
         local_patronymic = ""
     else:
         local_patronymic = employee.patronymic
+
+    # Проверка наличия ТД или ГПХ
+    contract_date = ' '
+    if employeeInOrg.employmentContractNumber == None:
+        contract_date = employeeInOrg.startDateOfGPHContract
+    else:
+        contract_date = employeeInOrg.employmentContractDate
+
+    # Получение полного адреса организация (с индексом)
+    all_address = organization.postCodeOrganization + \
+        " " + organization.legalOrganizationAddress
 
     # Получения данных о патенте
     name_patent_document = ""
@@ -655,6 +653,20 @@ def mia_notification_discharge(request, employee_in_org_id):
                     output_data[i].append('   ')
         return output_data[number_row-1]
 
+    # Разделение данных на несколько строк с заданным отступом
+    def split_data_rows_with_prev(data, prev, count_col, number_row):
+        data_up = data.upper()
+        data_split = list(data_up)
+        count_data_split = len(data_split)
+        length_to_split = [prev, count_col, count_col]
+        output_data = [data_split[x - y: x]
+                       for x, y in zip(accumulate(length_to_split), length_to_split)]
+        for i in range(len(output_data)):
+            if (len(output_data[i]) < count_col):
+                for k in range(count_col-len(output_data[i])):
+                    output_data[i].append('   ')
+        return output_data[number_row-1]
+
     # Проверка работает ли сотрудник по ТД или по ГПХ
     def contract_check(contract_number):
         mark_contract = " "
@@ -662,7 +674,7 @@ def mia_notification_discharge(request, employee_in_org_id):
             mark_contract = " "
             return mark_contract
         if (contract_number != None):
-            mark_contract = "X"
+            mark_contract = "V"
             return mark_contract
 
     context = {
@@ -689,22 +701,16 @@ def mia_notification_discharge(request, employee_in_org_id):
         'birthplace_contents': [
             {'cols': split_data_rows(
                 employee.birthplace, count_col=24, number_row=1)},
-            {'cols': split_data_rows(
-                employee.birthplace, count_col=24, number_row=2)},
-            {'cols': split_data_rows(
-                employee.birthplace, count_col=24, number_row=3)},
         ],
-        'birth_day_contents': [
+        'birthplace2_contents': [
+            {'cols': split_data_rows_with_prev(
+                employee.birthplace, prev=24, count_col=34, number_row=2)},
+        ],
+        'birthday_contents': [
             {'cols': split_day(defaultfilters.date(
-                employee.birthday, 'd.m.Y'))}
-        ],
-        'birth_mouth_contents': [
-            {'cols': split_month(defaultfilters.date(
-                employee.birthday, 'd.m.Y'))}
-        ],
-        'birth_year_contents': [
-            {'cols': split_year(defaultfilters.date(
-                employee.birthday, 'd.m.Y'))}
+                employee.birthday, 'd.m.Y')) + [" ", ] + split_month(defaultfilters.date(
+                    employee.birthday, 'd.m.Y')) + [" ", ] + split_year(defaultfilters.date(
+                        employee.birthday, 'd.m.Y'))}
         ],
         'type_identity_document_contents': [
             {'cols': split_data("паспорт", 19)}
@@ -715,25 +721,21 @@ def mia_notification_discharge(request, employee_in_org_id):
         'number_identity_document_contents': [
             {'cols': split_data(employee.passportNumber, 9)}
         ],
-        'identity_document_day_contents': [
+        'identity_document_date_contents': [
             {'cols': split_day(defaultfilters.date(
-                employee.passportIssueDate, 'd.m.Y'))}
-        ],
-        'identity_document_month_contents': [
-            {'cols': split_month(defaultfilters.date(
-                employee.passportIssueDate, 'd.m.Y'))}
-        ],
-        'identity_document_year_contents': [
-            {'cols': split_year(defaultfilters.date(
-                employee.passportIssueDate, 'd.m.Y'))}
+                employee.passportIssueDate, 'd.m.Y')) + [" ", ] + split_month(defaultfilters.date(employee.passportIssueDate, 'd.m.Y')) + [" ", ] + split_year(defaultfilters.date(employee.passportIssueDate, 'd.m.Y'))}
         ],
         'identity_document_issued_by_contents': [
             {'cols': split_data_rows(
                 employee.passportIssuedBy, count_col=28, number_row=1)},
-            {'cols': split_data_rows(
-                employee.passportIssuedBy, count_col=28, number_row=2)},
-            {'cols': split_data_rows(
-                employee.passportIssuedBy, count_col=28, number_row=3)},
+        ],
+        'identity_document_issued_by2_contents': [
+            {'cols': split_data_rows_with_prev(
+                employee.passportIssuedBy, prev=28, count_col=28, number_row=2)},
+        ],
+        'identity_document_issued_by3_contents': [
+            {'cols': split_data_rows_with_prev(
+                employee.passportIssuedBy, prev=56, count_col=13, number_row=2)},
         ],
         'name_labor_activity_document_contents': [
             {'cols': split_data_rows(
@@ -753,37 +755,21 @@ def mia_notification_discharge(request, employee_in_org_id):
         'patent_series_contents': [
             {'cols': split_data(patent_series, 7)}
         ],
-        'patent_start_day_contents': [
-            {'cols': split_day(defaultfilters.date(
-                patent_date_start, 'd.m.Y'))}
-        ],
-        'patent_start_mouth_contents': [
-            {'cols': split_month(defaultfilters.date(
-                patent_date_start, 'd.m.Y'))}
-        ],
-        'patent_start_year_contents': [
-            {'cols': split_year(defaultfilters.date(
-                patent_date_start, 'd.m.Y'))}
-        ],
-        'patent_end_day_contents': [
-            {'cols': split_day(defaultfilters.date(
-                patent_date_end, 'd.m.Y'))}
-        ],
-        'patent_end_mouth_contents': [
-            {'cols': split_month(defaultfilters.date(
-                patent_date_end, 'd.m.Y'))}
-        ],
-        'patent_end_year_contents': [
-            {'cols': split_year(defaultfilters.date(
-                patent_date_end, 'd.m.Y'))}
-        ],
+        'patent_start_date_contents': [{'cols': split_day(defaultfilters.date(
+            patent_date_start, 'd.m.Y'))+[" ", ]+split_month(defaultfilters.date(
+                patent_date_start, 'd.m.Y'))+[" ", ]+split_year(defaultfilters.date(
+                    patent_date_start, 'd.m.Y'))}],
+        'patent_end_date_contents': [{'cols': split_day(defaultfilters.date(
+            patent_date_end, 'd.m.Y'))+[" ", ]+split_month(defaultfilters.date(
+                patent_date_end, 'd.m.Y'))+[" ", ]+split_year(defaultfilters.date(
+                    patent_date_end, 'd.m.Y'))}],
         'patent_issued_by_contents': [
             {'cols': split_data_rows(
                 patent_issued_by, count_col=27, number_row=1)},
-            {'cols': split_data_rows(
-                patent_issued_by, count_col=27, number_row=2)},
-            {'cols': split_data_rows(
-                patent_issued_by, count_col=27, number_row=3)},
+        ],
+        'patent_issued_by2_contents': [
+            {'cols': split_data_rows_with_prev(
+                patent_issued_by, prev=27, count_col=34, number_row=2)},
         ],
         'contract_number_contents': [
             {'cols': contract_check(employeeInOrg.employmentContractNumber)}
@@ -791,17 +777,18 @@ def mia_notification_discharge(request, employee_in_org_id):
         'contract_gph_number_contents': [
             {'cols': contract_check(employeeInOrg.GPHContractNumber)}
         ],
-        'contract_start_day_contents': [
-            {'cols': split_day(defaultfilters.date(
-                employeeInOrg.dischargeDate, 'd.m.Y'))}
-        ],
-        'contract_start_mouth_contents': [
-            {'cols': split_month(defaultfilters.date(
-                employeeInOrg.dischargeDate, 'd.m.Y'))}
-        ],
-        'contract_start_year_contents': [
-            {'cols': split_year(defaultfilters.date(
-                employeeInOrg.dischargeDate, 'd.m.Y'))}
+        'discharge_date_contents': [{'cols': split_day(defaultfilters.date(
+            employeeInOrg.dischargeDate, 'd.m.Y'))+[" ", ]+split_month(defaultfilters.date(
+                employeeInOrg.dischargeDate, 'd.m.Y'))+[" ", ]+split_year(defaultfilters.date(
+                    employeeInOrg.dischargeDate, 'd.m.Y'))}],
+
+        'legal_organization_address_contents': [
+            {'cols': split_data_rows(
+                all_address, count_col=34, number_row=1)},
+            {'cols': split_data_rows(
+                all_address, count_col=34, number_row=2)},
+            {'cols': split_data_rows(
+                all_address, count_col=34, number_row=3)},
         ],
         'name_profession_contents': [
             {'cols': split_data_rows(
@@ -821,7 +808,7 @@ def mia_notification_discharge(request, employee_in_org_id):
     response = HttpResponse(doc_io.read())
 
     now = datetime.datetime.now().strftime("%d.%m.%Y_%H-%M-%S")
-    filename = f"Уведомление_МВД_об_увольнении_{employee.fullNameInGenetive}_{now}"
+    filename = f"Уведомление_МВД_о_приеме_{employee.fullNameInGenetive}_{now}"
     filename = escape_uri_path(filename)
     response["Content-Disposition"] = f"attachment; filename={filename}.docx"
     response["Content-Type"] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
