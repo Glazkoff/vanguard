@@ -28,17 +28,17 @@ def go_through_patents():
         formatEndDateOfRVP = defaultfilters.date(
             employee.endDateOfRVP, 'd E Y г.')
         formatEndDateOfResidencePermit = defaultfilters.date(
-            employee.endDateOfResidencePermit, 'd E Y г.')     
+            employee.endDateOfResidencePermit, 'd E Y г.')
         d = date.today()+timedelta(days=14)
         if employee.registrationValidityPeriod <= d:
-            notifications.append('Регистрация сотрудника <a href="/admin/employees/employee/'+str(employee.id)+'/change/">'+
-            employee.fullNameInGenetive+'</a> действует только до'+ formatRegistrationValidityPeriod + "!")
+            notifications.append('Регистрация сотрудника <a href="/admin/employees/employee/'+str(employee.id)+'/change/">' +
+                                 employee.fullNameInGenetive+'</a> действует только до ' + formatRegistrationValidityPeriod + "!")
         if employee.endDateOfRVP <= d:
-            notifications.append('РВП сотрудника <a href="/admin/employees/employee/'+str(employee.id)+'/change/">'+
-            employee.fullNameInGenetive+'</a> действует только до'+ formatEndDateOfRVP + "!")
-        if employee.endDateOfResidencePermit<=d:
-            notifications.append('Вид на жительство сотрудника <a href="/admin/employees/employee/'+str(employee.id)+'/change/">'+
-            employee.fullNameInGenetive+'</a> действует только до'+ formatEndDateOfResidencePermit + "!")
+            notifications.append('РВП сотрудника <a href="/admin/employees/employee/'+str(employee.id)+'/change/">' +
+                                 employee.fullNameInGenetive+'</a> действует только до ' + formatEndDateOfRVP + "!")
+        if employee.endDateOfResidencePermit <= d:
+            notifications.append('Вид на жительство сотрудника <a href="/admin/employees/employee/'+str(employee.id)+'/change/">' +
+                                 employee.fullNameInGenetive+'</a> действует только до ' + formatEndDateOfResidencePermit + "!")
     return notifications
 
 
