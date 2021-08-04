@@ -23,16 +23,16 @@ class EmployeeAdmin(ImportExportModelAdmin):
     search_fields = ('name', 'surname', 'patronymic', 'fullNameInGenetive')
     fieldsets = (
         (None, {
-            'fields': ('surname','name', 'patronymic', 'fullNameInGenetive', 'birthday', 'birthplace', 'phoneNumber', ('INN', 'SNILS'), 'bankDetailsCardNumber', ('endDateOfResidencePermit', 'endDateOfRVP'))
+            'fields': ('surname', 'name', 'patronymic', 'fullNameInGenetive', 'birthday', 'birthplace', 'phoneNumber', ('INN', 'SNILS'), 'bankDetailsCardNumber', ('endDateOfResidencePermit', 'endDateOfRVP'))
         }),
         ('Данные паспорта', {
-            'fields': (('passportSeries','passportNumber', 'passportValidityPeriod'), 'citizenship', 'passportIssuedBy', 'passportIssueDate')
+            'fields': (('passportSeries', 'passportNumber', 'passportValidityPeriod'), 'citizenship', 'passportIssuedBy', 'passportIssueDate')
         }),
         ('Данные о регистрации', {
             'fields': ('registrationValidityPeriod', 'registrationAddress')
         }),
         ('Данные из УФМС', {
-            'fields': ('nameMIA','dateOfNotificationUFMSadmission', 'dateOfNotificationUFMSdischarge')
+            'fields': ('nameMIA', 'dateOfNotificationUFMSadmission', 'dateOfNotificationUFMSdischarge')
         }),
     )
     resource_class = EmployeeResource
@@ -56,8 +56,6 @@ class EmployeeAdmin(ImportExportModelAdmin):
 
     def action_set(self, obj):
         tag_string = ""
-        # tag_string += f'<a target="_blank" href="/api/documents">Сформировать документ</a>'
-        # tag_string += f'<br /><a target="_blank" href="/api/documents_m">Сформировать много документов</a>'
         employeeInOrganizations = EmployeeInOrganization.objects.filter(
             employee=obj)
         for empInOrg in employeeInOrganizations:
@@ -72,6 +70,7 @@ class EmployeeAdmin(ImportExportModelAdmin):
     action_set.short_description = "Действия"
     # action_set.admin_order_field = '_last_payment_receipt'
     list_display = ('__str__', 'action_set')
+
 
 class EmployeeInOrganizationResource(resources.ModelResource):
     """Ресурс сотрудника в организации для импорта"""

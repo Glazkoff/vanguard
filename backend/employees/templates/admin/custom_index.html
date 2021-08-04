@@ -31,10 +31,49 @@
 </div>
 {% endblock %}<br />
 {% block sidebar %}{{ block.super }}
-<div style="display: none">
-  <h1>Ссылки</h1>
-  <a href="/api/documents/">Ссылка на пример одного файла</a><br />
-  <a href="/api/documents_m/">Ссылка на пример архива файлов</a>
-  <br />
+<div>
+  <h1>Список сотрудников</h1>
+  <table class="table table-light">
+    <tbody>
+      <tr>
+        <th>ID</th>
+        <th>Фамилия</th>
+        <th>Имя</th>
+        <th>Отчество</th>
+        <th>Гражданство</th>
+        <th>Действия</th>
+      </tr>
+      {% for employee in employees %}
+      <tr>
+        <td>
+          <a href="/employees/employee/{{employee.id}}/change/"
+            >{{employee.id}}</a
+          >
+        </td>
+        <td>
+          <a href="/employees/employee/{{employee.id}}/change/"
+            >{{employee.surname}}</a
+          >
+        </td>
+        <td>
+          <a href="/employees/employee/{{employee.id}}/change/"
+            >{{employee.name}}</a
+          >
+        </td>
+        <td>
+          <a href="/employees/employee/{{employee.id}}/change/"
+            >{{employee.patronymic}}</a
+          >
+        </td>
+        <td>
+          <a href="/employees/employee/{{employee.id}}/change/"
+            >{{employee.citizenship}}</a
+          >
+        </td>
+        <td>{{employee.actions}}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
 {% endblock %}

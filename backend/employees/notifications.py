@@ -1,5 +1,5 @@
 from patents.models import PatentPaymentReceipt, Patent
-from .models import Employee
+from .models import Employee, EmployeeInOrganization
 from datetime import date, timedelta
 from django.utils.html import format_html
 from django.template import defaultfilters
@@ -46,8 +46,26 @@ def go_through_patents():
     return notifications
 
 
+def action_set(obj):
+    tag_string = ""
+    employeeInOrganizations = EmployeeInOrganization.objects.filter(
+        employee=obj)
+    for empInOrg in employeeInOrganizations:
+        tag_string += f'<a target="_blank" style="margin-bottom: 1rem;" href="/api/documents/labor_contract/{empInOrg.id}">Сформировать трудовой договор ({empInOrg.tariff.positionName})</a>'
+        tag_string += f'<br /><a target="_blank" style="margin-bottom: 1rem;" href="/api/documents/gph_contract/{empInOrg.id}">Сформировать договор ГПХ</a>'
+        if empInOrg.employmentContractDate is not None or empInOrg.startDateOfGPHContract is not None:
+            tag_string += f'<br /><a target="_blank" style="margin-bottom: 1rem;" href="/api/documents/mia_notifications_admission/{empInOrg.id}">Сформировать уведомление в МВД о приеме</a>'
+        if empInOrg.dischargeDate is not None:
+            tag_string += f'<br /><a target="_blank" style="margin-bottom: 1rem;" href="/api/documents/mia_notification_discharge/{empInOrg.id}">Сформировать уведомление в МВД об увольнении</a>'
+    return format_html(tag_string)
+
+
 def context_processor(request):
     extra_context = {}
     # if request.path == '//':
     extra_context['notifications'] = go_through_patents()
+    employees = Employee.objects.all()
+    for employee in employees:
+        employee.actions = action_set(employee)
+    extra_context['employees'] = employees
     return extra_context
