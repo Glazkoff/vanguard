@@ -529,19 +529,12 @@ def mia_notifications_admission(request, employee_in_org_id):
 
 # Уведомление МВД об увольнени
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 08167a0b6e126e1c9d4f470037b2aff1f964fa57
 @login_required(login_url='/admin')
 def mia_notification_discharge(request, employee_in_org_id):
     # os.path.dirname(employees.__file__)
     doc = DocxTemplate(os.path.join(
         APP_ROOT, "docs", "mia_notification_discharge.docx"))
-<<<<<<< HEAD
-
-=======
->>>>>>> 08167a0b6e126e1c9d4f470037b2aff1f964fa57
     # Получение данных из моделей
     employeeInOrg = EmployeeInOrganization.objects.get(
         pk=employee_in_org_id)
@@ -808,7 +801,7 @@ def mia_notification_discharge(request, employee_in_org_id):
     response = HttpResponse(doc_io.read())
 
     now = datetime.datetime.now().strftime("%d.%m.%Y_%H-%M-%S")
-    filename = f"Уведомление_МВД_о_приеме_{employee.fullNameInGenetive}_{now}"
+    filename = f"Уведомление_МВД_об_увольнении_{employee.fullNameInGenetive}_{now}"
     filename = escape_uri_path(filename)
     response["Content-Disposition"] = f"attachment; filename={filename}.docx"
     response["Content-Type"] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
