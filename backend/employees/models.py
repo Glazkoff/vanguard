@@ -65,6 +65,15 @@ class Employee(models.Model):
     bankDetailsCardNumber = models.CharField(
         "Номер банковской карты", max_length=16, default="", blank=True
     )
+    bankDetailsBIC = models.CharField(
+        "БИК", max_length=9, default="", blank=True
+    )
+    bankDetailsPaymentAccount = models.CharField(
+        "Расчетный счет", max_length=20, default="", blank=True
+    )
+    bankDetailsNameBank = models.CharField(
+        "Название банка", default="",max_length=500
+    )
     endDateOfRVP = models.DateField(
         "Дата окончания РВП", null=True, blank=True)
     endDateOfResidencePermit = models.DateField(
