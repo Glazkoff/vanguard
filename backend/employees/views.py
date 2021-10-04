@@ -94,7 +94,7 @@ def labor_contract(request, employee_in_org_id):
             pk=employee_in_org_id)
         employee = Employee.objects.get(pk=employeeInOrg.employee.id)
         try:
-            patent = Patent.objects.get(pk=employeeInOrg.employee_id)
+            patent = Patent.objects.get(employee=Employee.objects.get(pk=employeeInOrg.employee_id))
         except Patent.DoesNotExist:
             patent = []
         employee_reason_work = ""
@@ -259,7 +259,7 @@ def mia_notifications_admission(request, employee_in_org_id):
         pk=employee_in_org_id)
     employee = Employee.objects.get(pk=employeeInOrg.employee_id)
     try:
-        patent = Patent.objects.get(pk=employeeInOrg.employee_id)
+        patent = Patent.objects.get(employee=Employee.objects.get(pk=employeeInOrg.employee_id))
     except Patent.DoesNotExist:
         patent = []
 
@@ -540,7 +540,7 @@ def mia_notification_discharge(request, employee_in_org_id):
         pk=employee_in_org_id)
     employee = Employee.objects.get(pk=employeeInOrg.employee_id)
     try:
-        patent = Patent.objects.get(pk=employeeInOrg.employee_id)
+        patent = Patent.objects.get(employee=Employee.objects.get(pk=employeeInOrg.employee_id))
     except Patent.DoesNotExist:
         patent = []
 
