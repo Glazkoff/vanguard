@@ -117,7 +117,7 @@ class EmployeeInOrganization(models.Model):
     admissionDate = models.DateField(
         "Дата принятия на работу по данному тарифу")
     admissionOrderNumber = models.CharField(
-        "Номер приказа о приёме", max_length=100)
+        "Номер приказа о приёме", max_length=100, null=True, blank=True)
     dischargeDate = models.DateField("Дата увольнения", null=True, blank=True)
     dischargeOrderNumber = models.CharField(
         "Номер приказа об увольнении", max_length=100, null=True, blank=True)
