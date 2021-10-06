@@ -34,7 +34,13 @@ class Employee(models.Model):
         "Родительный падеж ФИО", max_length=120, validators=[RegexValidator(regex=r'^[a-zA-Zа-яА-ЯёЁ -]+$', message="ФИО должно содержать только буквы", code=None, inverse_match=None, flags=0)])
     birthday = models.DateField("Дата рождения", validators=[MaxValueValidator(
         limit_value=date.today, message="Дата рождения не может превышать сегодняшнюю")])
-    birthplace = models.CharField("Место рождения", max_length=120)
+    birthplace_country = models.CharField("Страна", max_length=120, blank=True)
+    birthplace_subject = models.CharField("Субъект (край, область и т.д.)", max_length=120, blank=True)
+    birthplace_city = models.CharField("Город", max_length=120, blank=True)
+    birthplace_locality = models.CharField("Населенный пункт", max_length=120, blank=True)
+    birthplace_street = models.CharField("Улица", max_length=120, blank=True)
+    birthplace_home = models.CharField("Дом", max_length=120, blank=True)
+    birthplace_home_expansion = models.CharField("Расширение дома (корпус, строение, подъезд, этаж, квартира, офис,..).", max_length=120, blank=True)
     passportSeries = models.CharField(
         "Серия паспорта", max_length=10, default="", blank=True
     )
