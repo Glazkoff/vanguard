@@ -23,11 +23,11 @@ class EmployeeAdmin(ImportExportModelAdmin):
     search_fields = ('name', 'surname', 'patronymic', 'fullNameInGenetive')
     fieldsets = (
         (None, {
-            'fields': ('surname', 'name', 'patronymic', 'fullNameInGenetive', 'birthday', 'phoneNumber', ('INN', 'SNILS'), ('endDateOfResidencePermit', 'endDateOfRVP'))
+            'fields': ('surname', 'name', 'patronymic', 'fullNameInGenetive', 'birthday','birthplace', 'phoneNumber', ('INN', 'SNILS'), ('endDateOfResidencePermit', 'endDateOfRVP'))
         }),
-         ('Место рождения', {
-            'fields': ('birthplace_country', 'birthplace_subject','birthplace_city', 'birthplace_locality', 'birthplace_street','birthplace_home','birthplace_home_expansion' )
-        }),
+        #  ('Место рождения', {
+        #     'fields': ('birthplace_country', 'birthplace_subject','birthplace_city', 'birthplace_locality', 'birthplace_street','birthplace_home','birthplace_home_expansion' )
+        # }),
         ('Банковские данные', {
             'fields': (('bankDetailsNameBank', 'bankDetailsCardNumber'),('bankDetailsPaymentAccount', 'bankDetailsBIC') )
         }),
