@@ -35,6 +35,13 @@ class Employee(models.Model):
     birthday = models.DateField("Дата рождения", validators=[MaxValueValidator(
         limit_value=date.today, message="Дата рождения не может превышать сегодняшнюю")])
     birthplace = models.CharField("Место рождения", max_length=120)
+    # birthplace_country = models.CharField("Страна", max_length=120, blank=True)
+    # birthplace_subject = models.CharField("Субъект (край, область и т.д.)", max_length=120, blank=True)
+    # birthplace_city = models.CharField("Город", max_length=120, blank=True)
+    # birthplace_locality = models.CharField("Населенный пункт", max_length=120, blank=True)
+    # birthplace_street = models.CharField("Улица", max_length=120, blank=True)
+    # birthplace_home = models.CharField("Дом", max_length=120, blank=True)
+    # birthplace_home_expansion = models.CharField("Расширение дома (корпус, строение, подъезд, этаж, квартира, офис,..).", max_length=120, blank=True)
     passportSeries = models.CharField(
         "Серия паспорта", max_length=10, default="", blank=True
     )
@@ -117,7 +124,7 @@ class EmployeeInOrganization(models.Model):
     admissionDate = models.DateField(
         "Дата принятия на работу по данному тарифу")
     admissionOrderNumber = models.CharField(
-        "Номер приказа о приёме", max_length=100)
+        "Номер приказа о приёме", max_length=100, null=True, blank=True)
     dischargeDate = models.DateField("Дата увольнения", null=True, blank=True)
     dischargeOrderNumber = models.CharField(
         "Номер приказа об увольнении", max_length=100, null=True, blank=True)
