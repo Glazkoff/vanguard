@@ -145,9 +145,9 @@ def labor_contract(request, employee_in_org_id):
 
     return response
 
-
+# Договор ГПХ Авангард
 @login_required(login_url='/admin')
-def gph_contract(request, employee_in_org_id):
+def gph_contract_avangard(request, employee_in_org_id):
     doc = DocxTemplate(os.path.join(
         APP_ROOT, "docs", "gph.docx"))
     try:
@@ -183,13 +183,107 @@ def gph_contract(request, employee_in_org_id):
 
     now = datetime.datetime.now().strftime("%d.%m.%Y_%H-%M-%S")
 
-    filename = f"Договор_ГПХ_{employee.fullNameInGenetive}_{now}"
+    filename = f"Договор_ГПХ_Авангард_{employee.fullNameInGenetive}_{now}"
     filename = escape_uri_path(filename)
     response["Content-Disposition"] = f"attachment; filename={filename}.docx"
 
     response["Content-Type"] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 
     return response
+
+# Договор ГПХ Меркурий
+@login_required(login_url='/admin')
+def gph_contract_mercury(request, employee_in_org_id):
+    doc = DocxTemplate(os.path.join(
+        APP_ROOT, "docs", "gph_mercury.docx"))
+    try:
+        employeeInOrg = EmployeeInOrganization.objects.get(
+            pk=employee_in_org_id)
+        employee = Employee.objects.get(pk=employeeInOrg.employee_id)
+        context = {
+            'employee_full_name': (f"{employee.surname} {employee.name} {employee.patronymic}", f"{employee.surname} {employee.name}")[employee.patronymic is None],
+            'today': defaultfilters.date(datetime.datetime.today(), '«d» E Y г.'),
+            'employee_work_place': (f"{employeeInOrg.organization.legalOrganizationAddress}", "")[employeeInOrg.organization.legalOrganizationAddress is None],
+            'end_date_gph_contract': (defaultfilters.date(employeeInOrg.endDateOfGPHContract, 'd E Y г.'), "")[employeeInOrg.endDateOfGPHContract is None],
+            'employee_passport_series':  (f"серия {employee.passportSeries}  № ", "")[employee.passportSeries is None],
+            'employee_passport_number': (f"{employee.passportNumber}", "")[employee.passportNumber is None],
+            'employee_passport_issued_by': (f"{employee.passportIssuedBy}", "")[employee.passportIssuedBy is None],
+            'employee_passport_date_of_issue': (defaultfilters.date(employee.passportIssueDate, 'd E Y г.'), "")[employee.passportIssueDate is None],
+            'employee_registration_address': (f"{employee.registrationAddress}", "")[employee.registrationAddress is None],
+            'employee_inn': (f"{employee.INN}", "")[employee.INN is None],
+            'employee_phone': (f"{employee.phoneNumber}", "")[employee.phoneNumber is None],
+            'tariff': (f"{employeeInOrg.tariff.salaryPerHour}", "")[employeeInOrg.tariff.salaryPerHour is None],
+            'tariff_by_words': (get_string_by_number(employeeInOrg.tariff.salaryPerHour), "")[employeeInOrg.tariff.salaryPerHour is None],
+
+        }
+    except EmployeeInOrganization.DoesNotExist:
+        html = "<html><body><h1 style='font-family: sans-serif;'>Работник в организации не найден!</h1></body></html>"
+        return HttpResponse(html)
+
+    doc.render(context)
+    doc_io = io.BytesIO()
+    doc.save(doc_io)
+    doc_io.seek(0)
+
+    response = HttpResponse(doc_io.read())
+
+    now = datetime.datetime.now().strftime("%d.%m.%Y_%H-%M-%S")
+
+    filename = f"Договор_ГПХ_Меркурий_{employee.fullNameInGenetive}_{now}"
+    filename = escape_uri_path(filename)
+    response["Content-Disposition"] = f"attachment; filename={filename}.docx"
+
+    response["Content-Type"] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+
+    return response
+
+# Договор ГПХ Микадо
+@login_required(login_url='/admin')
+def gph_contract_mikado(request, employee_in_org_id):
+    doc = DocxTemplate(os.path.join(
+        APP_ROOT, "docs", "gph_mikado.docx"))
+    try:
+        employeeInOrg = EmployeeInOrganization.objects.get(
+            pk=employee_in_org_id)
+        employee = Employee.objects.get(pk=employeeInOrg.employee_id)
+        context = {
+            'employee_full_name': (f"{employee.surname} {employee.name} {employee.patronymic}", f"{employee.surname} {employee.name}")[employee.patronymic is None],
+            'today': defaultfilters.date(datetime.datetime.today(), '«d» E Y г.'),
+            'employee_work_place': (f"{employeeInOrg.organization.legalOrganizationAddress}", "")[employeeInOrg.organization.legalOrganizationAddress is None],
+            'end_date_gph_contract': (defaultfilters.date(employeeInOrg.endDateOfGPHContract, 'd E Y г.'), "")[employeeInOrg.endDateOfGPHContract is None],
+            'employee_passport_series':  (f"серия {employee.passportSeries}  № ", "")[employee.passportSeries is None],
+            'employee_passport_number': (f"{employee.passportNumber}", "")[employee.passportNumber is None],
+            'employee_passport_issued_by': (f"{employee.passportIssuedBy}", "")[employee.passportIssuedBy is None],
+            'employee_passport_date_of_issue': (defaultfilters.date(employee.passportIssueDate, 'd E Y г.'), "")[employee.passportIssueDate is None],
+            'employee_registration_address': (f"{employee.registrationAddress}", "")[employee.registrationAddress is None],
+            'employee_inn': (f"{employee.INN}", "")[employee.INN is None],
+            'employee_phone': (f"{employee.phoneNumber}", "")[employee.phoneNumber is None],
+            'tariff': (f"{employeeInOrg.tariff.salaryPerHour}", "")[employeeInOrg.tariff.salaryPerHour is None],
+            'tariff_by_words': (get_string_by_number(employeeInOrg.tariff.salaryPerHour), "")[employeeInOrg.tariff.salaryPerHour is None],
+
+        }
+    except EmployeeInOrganization.DoesNotExist:
+        html = "<html><body><h1 style='font-family: sans-serif;'>Работник в организации не найден!</h1></body></html>"
+        return HttpResponse(html)
+
+    doc.render(context)
+    doc_io = io.BytesIO()
+    doc.save(doc_io)
+    doc_io.seek(0)
+
+    response = HttpResponse(doc_io.read())
+
+    now = datetime.datetime.now().strftime("%d.%m.%Y_%H-%M-%S")
+
+    filename = f"Договор_ГПХ_Микадо_{employee.fullNameInGenetive}_{now}"
+    filename = escape_uri_path(filename)
+    response["Content-Disposition"] = f"attachment; filename={filename}.docx"
+
+    response["Content-Type"] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+
+    return response
+
+
 
 # Уведомление МВД о приеме
 
