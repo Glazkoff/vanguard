@@ -6,6 +6,12 @@ from datetime import date
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
+COMPANY_CHOICES = [
+    ('AV', 'Авангард'),
+    ('MI', 'Микадо'),
+    ('MP', 'Меркурий Плюс'),
+]
+
 
 class Employee(models.Model):
     """Работники"""
@@ -35,6 +41,8 @@ class Employee(models.Model):
     birthday = models.DateField("Дата рождения", validators=[MaxValueValidator(
         limit_value=date.today, message="Дата рождения не может превышать сегодняшнюю")])
     birthplace = models.CharField("Место рождения", max_length=120)
+    company = models.CharField(
+        "Компания", max_length=2, choices=COMPANY_CHOICES, default="AV")
     # birthplace_country = models.CharField("Страна", max_length=120, blank=True)
     # birthplace_subject = models.CharField("Субъект (край, область и т.д.)", max_length=120, blank=True)
     # birthplace_city = models.CharField("Город", max_length=120, blank=True)
@@ -79,24 +87,22 @@ class Employee(models.Model):
         "Расчетный счет", max_length=20, default="", blank=True
     )
     bankDetailsNameBank = models.CharField(
-        "Название банка", default="",max_length=500
+        "Название банка", default="", max_length=500
     )
     endDateOfRVP = models.DateField(
         "Дата окончания РВП", null=True, blank=True)
     endDateOfResidencePermit = models.DateField(
         "Дата окончания вида на жительство", null=True, blank=True)
 
-    createdAt = models.DateTimeField(auto_now_add=True)
-    updatedAt = models.DateTimeField(auto_now=True)
+    createdAt = models.DateTimeField("Создан", auto_now_add=True)
+    updatedAt = models.DateTimeField("Обновлён", auto_now=True)
 
     def __str__(self):
-        if self.patronymic is None: 
+        if self.patronymic is None:
             local_patronymic = ""
         else:
             local_patronymic = self.patronymic
         return f"{self.surname} {self.name} {local_patronymic}"
-        
-
 
     class Meta:
         verbose_name = "Работник"
@@ -106,11 +112,14 @@ class Employee(models.Model):
     #     if self.dateOfNotificationUFMSadmission > self.dateOfNotificationUFMSdischarge:
     #         raise ValidationError("Дата уведомления о приеме превышает даты при увольнении")
 
+
 REASON_WORK_SELECTION = [
     ('P', 'Патент'),
     ('EAEU', 'ЕАЭС'),
     ('S', 'Другое'),
 ]
+
+
 class EmployeeInOrganization(models.Model):
     """Сотрудник в организации"""
     employee = models.ForeignKey(

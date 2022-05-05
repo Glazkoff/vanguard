@@ -18,18 +18,18 @@ class EmployeeResource(resources.ModelResource):
 class EmployeeAdmin(ImportExportModelAdmin):
     """Работники"""
     exclude = ('createdAt', 'updatedAt')
-    list_filter = ('birthday', 'citizenship', ('registrationValidityPeriod', DateRangeFilter), ('dateOfNotificationUFMSadmission', DateRangeFilter),
+    list_filter = ('company', 'birthday', 'citizenship', ('registrationValidityPeriod', DateRangeFilter), ('dateOfNotificationUFMSadmission', DateRangeFilter),
                    ('dateOfNotificationUFMSdischarge', DateRangeFilter), ('endDateOfResidencePermit', DateRangeFilter), ('endDateOfRVP', DateRangeFilter))
     search_fields = ('name', 'surname', 'patronymic', 'fullNameInGenetive')
     fieldsets = (
         (None, {
-            'fields': ('surname', 'name', 'patronymic', 'fullNameInGenetive', 'birthday','birthplace', 'phoneNumber', ('INN', 'SNILS'), ('endDateOfResidencePermit', 'endDateOfRVP'))
+            'fields': ('company', 'surname', 'name', 'patronymic', 'fullNameInGenetive', 'birthday', 'birthplace', 'phoneNumber', ('INN', 'SNILS'), ('endDateOfResidencePermit', 'endDateOfRVP'))
         }),
         #  ('Место рождения', {
         #     'fields': ('birthplace_country', 'birthplace_subject','birthplace_city', 'birthplace_locality', 'birthplace_street','birthplace_home','birthplace_home_expansion' )
         # }),
         ('Банковские данные', {
-            'fields': (('bankDetailsNameBank', 'bankDetailsCardNumber'),('bankDetailsPaymentAccount', 'bankDetailsBIC') )
+            'fields': (('bankDetailsNameBank', 'bankDetailsCardNumber'), ('bankDetailsPaymentAccount', 'bankDetailsBIC'))
         }),
         ('Данные паспорта', {
             'fields': (('passportSeries', 'passportNumber', 'passportValidityPeriod'), 'citizenship', 'passportIssuedBy', 'passportIssueDate')
@@ -75,7 +75,8 @@ class EmployeeAdmin(ImportExportModelAdmin):
 
     action_set.short_description = "Действия"
     # action_set.admin_order_field = '_last_payment_receipt'
-    list_display = ('__str__', 'action_set')
+    list_display = ('__str__', 'company', 'action_set',
+                    'registrationValidityPeriod', 'createdAt')
 
 
 class EmployeeInOrganizationResource(resources.ModelResource):
@@ -87,8 +88,10 @@ class EmployeeInOrganizationResource(resources.ModelResource):
 class EmployeeInOrganizationAdmin(ImportExportModelAdmin):
     """Работники, прикрепленные к организациям"""
     exclude = ('createdAt', 'updatedAt')
-    list_filter = ('tariff__positionName', 'organization__organizationName','city__cityName',)
-    search_fields = ('tariff__positionName', 'organization__organizationName','city__cityName',)
+    list_filter = ('tariff__positionName',
+                   'organization__organizationName', 'city__cityName',)
+    search_fields = ('tariff__positionName',
+                     'organization__organizationName', 'city__cityName',)
     resource_class = EmployeeInOrganizationResource
 
     def get_export_formats(self):
