@@ -71,6 +71,12 @@ class EmployeeAdmin(ImportExportModelAdmin):
                 tag_string += f'<br /><a target="_blank" style="margin-bottom: 1rem;" href="/api/documents/mia_notifications_admission/{empInOrg.id}">Сформировать уведомление в МВД о приеме</a>'
             if empInOrg.dischargeDate is not None:
                 tag_string += f'<br /><a target="_blank" style="margin-bottom: 1rem;" href="/api/documents/mia_notification_discharge/{empInOrg.id}">Сформировать уведомление в МВД об увольнении</a>'
+            if obj.company == "AV":
+                tag_string += f'<br /><a target="_blank" style="margin-bottom: 1rem;" href="/api/documents/cover_letter/avangard/{empInOrg.id}">Сформировать сопроводительное письмо Авангард</a>'
+            elif obj.company == "MI":
+                tag_string += f'<br /><a target="_blank" style="margin-bottom: 1rem;" href="/api/documents/cover_letter/mikado/{empInOrg.id}">Сформировать сопроводительное письмо Микадо</a>'
+            elif obj.company == "MP":
+                tag_string += f'<br /><a target="_blank" style="margin-bottom: 1rem;" href="/api/documents/cover_letter/mercury/{empInOrg.id}">Сформировать сопроводительное письмо Меркурий Плюс</a>'
         return format_html(tag_string)
 
     action_set.short_description = "Действия"
