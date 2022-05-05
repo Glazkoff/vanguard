@@ -94,7 +94,8 @@ def labor_contract(request, employee_in_org_id):
             pk=employee_in_org_id)
         employee = Employee.objects.get(pk=employeeInOrg.employee.id)
         try:
-            patent = Patent.objects.get(employee=Employee.objects.get(pk=employeeInOrg.employee_id))
+            patent = Patent.objects.get(
+                employee=Employee.objects.get(pk=employeeInOrg.employee_id))
         except Patent.DoesNotExist:
             patent = []
         employee_reason_work = ""
@@ -353,7 +354,8 @@ def mia_notifications_admission(request, employee_in_org_id):
         pk=employee_in_org_id)
     employee = Employee.objects.get(pk=employeeInOrg.employee_id)
     try:
-        patent = Patent.objects.get(employee=Employee.objects.get(pk=employeeInOrg.employee_id))
+        patent = Patent.objects.get(
+            employee=Employee.objects.get(pk=employeeInOrg.employee_id))
     except Patent.DoesNotExist:
         patent = []
 
@@ -634,7 +636,8 @@ def mia_notification_discharge(request, employee_in_org_id):
         pk=employee_in_org_id)
     employee = Employee.objects.get(pk=employeeInOrg.employee_id)
     try:
-        patent = Patent.objects.get(employee=Employee.objects.get(pk=employeeInOrg.employee_id))
+        patent = Patent.objects.get(
+            employee=Employee.objects.get(pk=employeeInOrg.employee_id))
     except Patent.DoesNotExist:
         patent = []
 
@@ -896,6 +899,126 @@ def mia_notification_discharge(request, employee_in_org_id):
 
     now = datetime.datetime.now().strftime("%d.%m.%Y_%H-%M-%S")
     filename = f"Уведомление_МВД_об_увольнении_{employee.fullNameInGenetive}_{now}"
+    filename = escape_uri_path(filename)
+    response["Content-Disposition"] = f"attachment; filename={filename}.docx"
+    response["Content-Type"] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+
+    return response
+
+
+@login_required(login_url='/admin')
+def cover_letter_avangard(request, employee_in_org_id):
+    doc = DocxTemplate(os.path.join(
+        APP_ROOT, "docs", "cover_letter_avangard.docx"))
+    employeeInOrg = EmployeeInOrganization.objects.get(
+        pk=employee_in_org_id)
+    employee = Employee.objects.get(pk=employeeInOrg.employee_id)
+    organization = Organization.objects.get(pk=employeeInOrg.organization_id)
+
+    if employeeInOrg.employmentContractNumber != "":
+        contract_start_date_contents = employeeInOrg.employmentContractDate
+        contract_number_contents = employeeInOrg.employmentContractNumber
+    else:
+        contract_start_date_contents = employeeInOrg.startDateOfGPHContract
+        contract_number_contents = employeeInOrg.GPHContractNumber
+
+    context = {
+        'contract_number_contents': contract_number_contents,
+        'contract_start_date_contents':
+            defaultfilters.date(contract_start_date_contents, 'd E Y'),
+        'employee_work_place': organization.legalOrganizationAddress,
+        'employee_full_name': employee.surname + " " + employee.name + " " + employee.patronymic
+    }
+
+    doc.render(context)
+    doc_io = io.BytesIO()
+    doc.save(doc_io)
+    doc_io.seek(0)
+
+    response = HttpResponse(doc_io.read())
+
+    now = datetime.datetime.now().strftime("%d.%m.%Y_%H-%M-%S")
+    filename = f"Сопроводительное_письмо_Авангард_{employee.fullNameInGenetive}_{now}"
+    filename = escape_uri_path(filename)
+    response["Content-Disposition"] = f"attachment; filename={filename}.docx"
+    response["Content-Type"] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+
+    return response
+
+
+@login_required(login_url='/admin')
+def cover_letter_mikado(request, employee_in_org_id):
+    doc = DocxTemplate(os.path.join(
+        APP_ROOT, "docs", "cover_letter_mikado.docx"))
+    employeeInOrg = EmployeeInOrganization.objects.get(
+        pk=employee_in_org_id)
+    employee = Employee.objects.get(pk=employeeInOrg.employee_id)
+    organization = Organization.objects.get(pk=employeeInOrg.organization_id)
+
+    if employeeInOrg.employmentContractNumber != "":
+        contract_start_date_contents = employeeInOrg.employmentContractDate
+        contract_number_contents = employeeInOrg.employmentContractNumber
+    else:
+        contract_start_date_contents = employeeInOrg.startDateOfGPHContract
+        contract_number_contents = employeeInOrg.GPHContractNumber
+
+    context = {
+        'contract_number_contents': contract_number_contents,
+        'contract_start_date_contents':
+            defaultfilters.date(contract_start_date_contents, 'd E Y'),
+        'employee_work_place': organization.legalOrganizationAddress,
+        'employee_full_name': employee.surname + " " + employee.name + " " + employee.patronymic
+    }
+
+    doc.render(context)
+    doc_io = io.BytesIO()
+    doc.save(doc_io)
+    doc_io.seek(0)
+
+    response = HttpResponse(doc_io.read())
+
+    now = datetime.datetime.now().strftime("%d.%m.%Y_%H-%M-%S")
+    filename = f"Сопроводительное_письмо_Микадо_{employee.fullNameInGenetive}_{now}"
+    filename = escape_uri_path(filename)
+    response["Content-Disposition"] = f"attachment; filename={filename}.docx"
+    response["Content-Type"] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+
+    return response
+
+
+@login_required(login_url='/admin')
+def cover_letter_mercury(request, employee_in_org_id):
+    doc = DocxTemplate(os.path.join(
+        APP_ROOT, "docs", "cover_letter_mercury.docx"))
+    employeeInOrg = EmployeeInOrganization.objects.get(
+        pk=employee_in_org_id)
+    employee = Employee.objects.get(pk=employeeInOrg.employee_id)
+    organization = Organization.objects.get(pk=employeeInOrg.organization_id)
+
+    if employeeInOrg.employmentContractNumber != "":
+        contract_start_date_contents = employeeInOrg.employmentContractDate
+        contract_number_contents = employeeInOrg.employmentContractNumber
+    else:
+        contract_start_date_contents = employeeInOrg.startDateOfGPHContract
+        contract_number_contents = employeeInOrg.GPHContractNumber
+
+    context = {
+        'contract_number_contents': contract_number_contents,
+        'contract_start_date_contents':
+            defaultfilters.date(contract_start_date_contents, 'd E Y'),
+        'employee_work_place': organization.legalOrganizationAddress,
+        'employee_full_name': employee.surname + " " + employee.name + " " + employee.patronymic
+    }
+
+    doc.render(context)
+    doc_io = io.BytesIO()
+    doc.save(doc_io)
+    doc_io.seek(0)
+
+    response = HttpResponse(doc_io.read())
+
+    now = datetime.datetime.now().strftime("%d.%m.%Y_%H-%M-%S")
+    filename = f"Сопроводительное_письмо_Меркурий_Плюс_{employee.fullNameInGenetive}_{now}"
     filename = escape_uri_path(filename)
     response["Content-Disposition"] = f"attachment; filename={filename}.docx"
     response["Content-Type"] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
