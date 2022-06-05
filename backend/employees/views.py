@@ -147,6 +147,8 @@ def labor_contract(request, employee_in_org_id):
     return response
 
 # Договор ГПХ Авангард
+
+
 @login_required(login_url='/admin')
 def gph_contract_avangard(request, employee_in_org_id):
     doc = DocxTemplate(os.path.join(
@@ -193,6 +195,8 @@ def gph_contract_avangard(request, employee_in_org_id):
     return response
 
 # Договор ГПХ Меркурий
+
+
 @login_required(login_url='/admin')
 def gph_contract_mercury(request, employee_in_org_id):
     doc = DocxTemplate(os.path.join(
@@ -239,6 +243,8 @@ def gph_contract_mercury(request, employee_in_org_id):
     return response
 
 # Договор ГПХ Микадо
+
+
 @login_required(login_url='/admin')
 def gph_contract_mikado(request, employee_in_org_id):
     doc = DocxTemplate(os.path.join(
@@ -283,7 +289,6 @@ def gph_contract_mikado(request, employee_in_org_id):
     response["Content-Type"] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 
     return response
-
 
 
 # Уведомление МВД о приеме
@@ -922,12 +927,18 @@ def cover_letter_avangard(request, employee_in_org_id):
         contract_start_date_contents = employeeInOrg.startDateOfGPHContract
         contract_number_contents = employeeInOrg.GPHContractNumber
 
+    access_date = ""
+    if employeeInOrg.accessDate != "" and employeeInOrg.accessDate is not None:
+        access_date = "с " + \
+            str(defaultfilters.date(employeeInOrg.accessDate, 'd.m.Y'))+" года"
+
     context = {
         'contract_number_contents': contract_number_contents,
         'contract_start_date_contents':
             defaultfilters.date(contract_start_date_contents, 'd E Y'),
         'employee_work_place': organization.legalOrganizationAddress,
-        'employee_full_name': employee.surname + " " + employee.name + " " + employee.patronymic
+        'employee_full_name': employee.surname + " " + employee.name + " " + employee.patronymic,
+        'access_date': access_date
     }
 
     doc.render(context)
@@ -962,12 +973,18 @@ def cover_letter_mikado(request, employee_in_org_id):
         contract_start_date_contents = employeeInOrg.startDateOfGPHContract
         contract_number_contents = employeeInOrg.GPHContractNumber
 
+    access_date = ""
+    if employeeInOrg.accessDate != "" and employeeInOrg.accessDate is not None:
+        access_date = "с " + \
+            str(defaultfilters.date(employeeInOrg.accessDate, 'd.m.Y'))+" года"
+
     context = {
         'contract_number_contents': contract_number_contents,
         'contract_start_date_contents':
             defaultfilters.date(contract_start_date_contents, 'd E Y'),
         'employee_work_place': organization.legalOrganizationAddress,
-        'employee_full_name': employee.surname + " " + employee.name + " " + employee.patronymic
+        'employee_full_name': employee.surname + " " + employee.name + " " + employee.patronymic,
+        'access_date': access_date
     }
 
     doc.render(context)
@@ -1002,12 +1019,18 @@ def cover_letter_mercury(request, employee_in_org_id):
         contract_start_date_contents = employeeInOrg.startDateOfGPHContract
         contract_number_contents = employeeInOrg.GPHContractNumber
 
+    access_date = ""
+    if employeeInOrg.accessDate != "" and employeeInOrg.accessDate is not None:
+        access_date = "с " + \
+            str(defaultfilters.date(employeeInOrg.accessDate, 'd.m.Y'))+" года"
+
     context = {
         'contract_number_contents': contract_number_contents,
         'contract_start_date_contents':
             defaultfilters.date(contract_start_date_contents, 'd E Y'),
         'employee_work_place': organization.legalOrganizationAddress,
-        'employee_full_name': employee.surname + " " + employee.name + " " + employee.patronymic
+        'employee_full_name': employee.surname + " " + employee.name + " " + employee.patronymic,
+        'access_date': access_date
     }
 
     doc.render(context)

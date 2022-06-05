@@ -75,7 +75,7 @@ class Employee(models.Model):
     dateOfNotificationUFMSdischarge = models.DateField(
         "Дата уведомления УФМС при увольнении", null=True, blank=True)
     nameMIA = models.CharField(
-        "Название МВД", max_length=240, blank=True
+        "Название МВД", max_length=240, null=True, blank=True
     )
     bankDetailsCardNumber = models.CharField(
         "Номер банковской карты", max_length=16, default="", blank=True
@@ -149,6 +149,8 @@ class EmployeeInOrganization(models.Model):
         "Дата окончания действия ГПХ Договора", null=True, blank=True)
     reasonWorkEmployee = models.CharField(
         verbose_name="Основание работы сотрудника", max_length=120, choices=REASON_WORK_SELECTION)
+    accessDate = models.DateField(
+        "Дата доступа в ресторан (сопроводительное)", null=True, blank=True)
 
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)

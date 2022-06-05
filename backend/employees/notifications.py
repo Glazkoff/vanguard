@@ -34,7 +34,7 @@ def go_through_patents():
             employee.registrationValidityPeriod is not None
             and employee.registrationValidityPeriod <= d
         ):
-            notifications.append('Регистрация сотрудника <a href="/admin/employees/employee/'+str(employee.id)+'/change/">' +
+            notifications.append('Регистрация сотрудника <a href="/employees/employee/'+str(employee.id)+'/change/">' +
                                  employee.fullNameInGenetive+'</a> действует только до ' + formatRegistrationValidityPeriod + "!")
         if (employee.endDateOfRVP is not None
                 and employee.endDateOfRVP <= d):
