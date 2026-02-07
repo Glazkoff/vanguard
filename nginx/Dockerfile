@@ -11,7 +11,7 @@
 # RUN npm run build
 
 # Stage 2 - nginx & frontend dist
-FROM nginx:alpine
+FROM nginx:1.29.5-alpine3.23
 
 COPY nginx/prod.conf /etc/nginx/nginx.conf
 COPY nginx/favicon/* /var/www/favicon/
